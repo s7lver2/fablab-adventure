@@ -1,24 +1,12 @@
-import type { CurriculumRepository } from '../curriculum/repository'
-import type { ProgressRepository } from './repository'
+import type { ChallengeSummary } from '../curriculum/types'
 
-/**
- * Finds the next challenge in linear order.
- * Returns the slug of the first non-completed challenge, or null if all are completed.
- */
+/** Lineal: el primer reto (por orden) que el usuario aún no ha completado. */
 export function nextChallengeSlug(
-  curriculum: CurriculumRepository,
-  progress: ProgressRepository,
-  userId: number,
+  challenges: ChallengeSummary[],
+  completedIds: number[],
 ): string | null {
-  const completed = progress.completedChallengeIds(userId)
-  const completedSet = new Set(completed)
-
-  const challenges = curriculum.listChallenges()
-  for (const challenge of challenges) {
-    if (!completedSet.has(challenge.id)) {
-      return challenge.slug
-    }
-  }
-
-  return null
+  const done = new Set(completedIds)
+  const ordered = [...challenges].sort((a, b) => a.ord - b.ord || a.id - b.id)
+  const next = ordered.find((c) => !done.has(c.id))
+  return next ? next.slug : null
 }
