@@ -90,6 +90,12 @@ export function createSchema(db: Database.Database): void {
       resolved_at INTEGER
     );
   `)
+  // Migración idempotente: añadir chosen_language si no existe
+  try {
+    db.exec("ALTER TABLE users ADD COLUMN chosen_language TEXT")
+  } catch {
+    // columna ya existe
+  }
   seedRoot(db)
 }
 

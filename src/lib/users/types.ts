@@ -1,3 +1,5 @@
+import type { Language } from '../curriculum/types'
+
 export type Role = 'user' | 'admin' | 'root'
 
 export interface User {
@@ -10,6 +12,7 @@ export interface User {
   hidden: boolean
   createdAt: number
   lastSeen: number
+  chosenLanguage: Language | null
 }
 
 export interface ProfileUpdate {

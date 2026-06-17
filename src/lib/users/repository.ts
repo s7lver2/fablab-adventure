@@ -1,5 +1,6 @@
 import type Database from 'better-sqlite3'
 import type { ProfileUpdate, Role, User } from './types'
+import type { Language } from '../curriculum/types'
 import { hashPassword, verifyPassword as verifyHash } from '../auth/password'
 
 interface UserRow {
@@ -12,6 +13,7 @@ interface UserRow {
   hidden: number
   created_at: number
   last_seen: number
+  chosen_language?: string | null
 }
 
 function toUser(row: UserRow): User {
@@ -25,6 +27,7 @@ function toUser(row: UserRow): User {
     hidden: row.hidden === 1,
     createdAt: row.created_at,
     lastSeen: row.last_seen,
+    chosenLanguage: (row.chosen_language as Language | null) ?? null,
   }
 }
 
@@ -106,5 +109,11 @@ export class UserRepository {
 
   setRole(userId: number, role: Role): void {
     this.db.prepare("UPDATE users SET role = ? WHERE id = ? AND role != 'root'").run(role, userId)
+  }
+
+  setLanguage(userId: number, lang: Language): void {
+    this.db
+      .prepare('UPDATE users SET chosen_language = ? WHERE id = ?')
+      .run(lang, userId)
   }
 }
