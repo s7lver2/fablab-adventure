@@ -1,11 +1,16 @@
 import type { RunResult } from './js-runner'
+import type { Language } from '../curriculum/types'
 
 const TIMEOUT_MS = 3000
 
-/** Ejecuta el código del alumno en un Worker aislado, abortando si tarda demasiado. */
-export function runInWorker(code: string, input: unknown): Promise<RunResult> {
+export function runInWorker(code: string, input: unknown, language: Language = 'js'): Promise<RunResult> {
   return new Promise((resolve) => {
-    const worker = new Worker(new URL('./worker.ts', import.meta.url))
+    const workerUrl =
+      language === 'python'
+        ? new URL('./python-worker.ts', import.meta.url)
+        : new URL('./worker.ts', import.meta.url)
+
+    const worker = new Worker(workerUrl)
     const timer = setTimeout(() => {
       worker.terminate()
       resolve({
