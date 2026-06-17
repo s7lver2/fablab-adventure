@@ -13,6 +13,7 @@ export default async function HomePage() {
   const db = getDb()
   const user = await getCurrentUser(new UserRepository(db))
   if (!user) redirect('/login')
+  if (!user.chosenLanguage) redirect('/onboarding')
 
   const curriculum = new CurriculumRepository(db)
   const progress = new ProgressRepository(db)

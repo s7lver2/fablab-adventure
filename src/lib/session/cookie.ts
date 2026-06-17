@@ -50,5 +50,6 @@ export function resolveUserFromCookie(db: Database.Database, token: string): Use
     hidden: row.hidden,
     createdAt: row.created_at,
     lastSeen: row.last_seen,
+    chosenLanguage: row.chosen_language ?? null,
   }
 }
