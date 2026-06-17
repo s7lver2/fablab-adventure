@@ -6,6 +6,8 @@ import { ProgressRepository } from '@/lib/progress/repository'
 import { getCurrentUser } from '@/lib/session/server'
 import { gradeSubmission } from '@/lib/grading/grade'
 import { nextChallengeSlug } from '@/lib/progress/next'
+import { EventLogger } from '@/lib/analytics/events'
+import { recordEvent } from '@/lib/analytics/record'
 
 export async function POST(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -33,6 +35,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     hintsUsed,
   })
   progress.recordAttempt(user.id, challenge.id, { stars, hintsUsed, completed: correct })
+
+  // Registrar evento de envío
+  await recordEvent(new EventLogger(db), {
+    type: 'submit',
+    userId: user.id,
+    path: `/api/challenges/${slug}/submit`,
+    meta: { slug, correct, stars },
+  })
 
   const next = nextChallengeSlug(curriculum.listChallenges(), progress.completedChallengeIds(user.id))
   return NextResponse.json({ correct, stars, next })
