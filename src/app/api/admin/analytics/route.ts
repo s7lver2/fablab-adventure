@@ -32,7 +32,9 @@ export async function GET() {
     status: string
     attempts: number
   }[]
-  const stuck = stuckReport(progressRows)
+  const stuck = stuckReport(
+    progressRows.map((r) => ({ challengeId: r.challenge_id, status: r.status, attempts: r.attempts })),
+  )
   const curriculum = new CurriculumRepository(db)
   const titleById: Record<number, string> = {}
   for (const c of curriculum.listChallenges()) titleById[c.id] = c.title
