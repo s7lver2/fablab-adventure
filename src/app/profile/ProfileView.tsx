@@ -29,6 +29,7 @@ export function ProfileView({
   const [profileMessage, setProfileMessage] = useState(initialProfileMessage)
   const [editing, setEditing] = useState(false)
   const [error, setError] = useState('')
+  const [resetting, setResetting] = useState(false)
 
   // Borradores para poder cancelar sin perder los valores guardados
   const [draftName, setDraftName] = useState(displayName)
@@ -64,6 +65,13 @@ export function ProfileView({
     setAvatar(draftAvatar)
     setProfileMessage(draftMessage)
     setEditing(false)
+  }
+
+  async function resetLanguage() {
+    if (!confirm('¿Seguro? Esto borrará todo tu progreso y podrás elegir otro lenguaje desde cero.')) return
+    setResetting(true)
+    await fetch('/api/me/language', { method: 'DELETE' })
+    window.location.href = '/onboarding'
   }
 
   if (editing) {
@@ -135,6 +143,15 @@ export function ProfileView({
           </ul>
         </>
       )}
+
+      <button
+        onClick={resetLanguage}
+        disabled={resetting}
+        className="btn btn-secondary"
+        style={{ marginTop: '1.5rem', width: '100%' }}
+      >
+        {resetting ? 'Reiniciando…' : '🔄 Cambiar lenguaje (borra progreso)'}
+      </button>
     </>
   )
 }
