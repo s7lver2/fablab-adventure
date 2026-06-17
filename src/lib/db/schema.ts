@@ -75,6 +75,20 @@ export function createSchema(db: Database.Database): void {
     );
     CREATE INDEX IF NOT EXISTS idx_events_created ON events(created_at);
     CREATE INDEX IF NOT EXISTS idx_events_session ON events(session_id);
+    CREATE TABLE IF NOT EXISTS review_requests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL REFERENCES users(id),
+      challenge_id INTEGER NOT NULL REFERENCES challenges(id),
+      language TEXT NOT NULL,
+      submitted_code TEXT NOT NULL,
+      submitted_output TEXT NOT NULL,
+      message TEXT NOT NULL DEFAULT '',
+      status TEXT NOT NULL DEFAULT 'pending',
+      reviewer_admin_id INTEGER REFERENCES users(id),
+      feedback TEXT NOT NULL DEFAULT '',
+      created_at INTEGER NOT NULL,
+      resolved_at INTEGER
+    );
   `)
   seedRoot(db)
 }
