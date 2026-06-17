@@ -84,4 +84,27 @@ export class UserRepository {
       .prepare('UPDATE users SET password_hash = ? WHERE username = ?')
       .run(hashPassword(plain), username.trim().toLowerCase())
   }
+
+  listAll(includeHidden = false): User[] {
+    const rows = this.db
+      .prepare(`SELECT * FROM users ${includeHidden ? '' : 'WHERE hidden = 0'} ORDER BY created_at`)
+      .all() as UserRow[]
+    return rows.map(toUser)
+  }
+
+  createAdmin(username: string, displayName: string, password: string): User {
+    const clean = username.trim().toLowerCase()
+    const now = Date.now()
+    const info = this.db
+      .prepare(
+        `INSERT INTO users (username, display_name, role, hidden, password_hash, created_at, last_seen)
+         VALUES (?, ?, 'admin', 0, ?, ?, ?)`,
+      )
+      .run(clean, displayName || clean, hashPassword(password), now, now)
+    return this.findById(Number(info.lastInsertRowid))!
+  }
+
+  setRole(userId: number, role: Role): void {
+    this.db.prepare("UPDATE users SET role = ? WHERE id = ? AND role != 'root'").run(role, userId)
+  }
 }
