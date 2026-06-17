@@ -23,3 +23,12 @@ export interface FullChallenge extends ChallengeSummary {
   variants: Partial<Record<Language, ChallengeVariant>>
   testCases: TestCase[]
 }
+
+export interface ConceptWithChallenges {
+  id: number
+  slug: string
+  name: string
+  description: string
+  ord: number
+  challenges: ChallengeSummary[]
+}

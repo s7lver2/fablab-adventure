@@ -33,3 +33,29 @@ describe('CurriculumRepository', () => {
     expect(repo.getChallengeBySlug('no-existe')).toBeNull()
   })
 })
+
+describe('CurriculumRepository.listConceptsWithChallenges', () => {
+  let db: Database.Database
+
+  beforeEach(() => {
+    db = new Database(':memory:')
+    createSchema(db)
+    seedCurriculum(db)
+  })
+
+  it('retorna 4 conceptos', () => {
+    const concepts = new CurriculumRepository(db).listConceptsWithChallenges()
+    expect(concepts).toHaveLength(4)
+  })
+
+  it('el primer concepto tiene 5 retos', () => {
+    const [first] = new CurriculumRepository(db).listConceptsWithChallenges()
+    expect(first.challenges).toHaveLength(5)
+  })
+
+  it('los retos están ordenados por ord', () => {
+    const [first] = new CurriculumRepository(db).listConceptsWithChallenges()
+    const ords = first.challenges.map((c) => c.ord)
+    expect(ords).toEqual([...ords].sort((a, b) => a - b))
+  })
+})

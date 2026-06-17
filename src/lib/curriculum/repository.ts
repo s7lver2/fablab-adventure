@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3'
-import type { ChallengeSummary, ChallengeVariant, FullChallenge, Language, TestCase } from './types'
+import type { ChallengeSummary, ChallengeVariant, ConceptWithChallenges, FullChallenge, Language, TestCase } from './types'
 
 export class CurriculumRepository {
   constructor(private db: Database.Database) {}
@@ -46,5 +46,18 @@ export class CurriculumRepository {
       variants,
       testCases,
     }
+  }
+
+  listConceptsWithChallenges(): ConceptWithChallenges[] {
+    const concepts = this.db
+      .prepare('SELECT id, slug, name, description, ord FROM concepts ORDER BY ord ASC')
+      .all() as { id: number; slug: string; name: string; description: string; ord: number }[]
+
+    return concepts.map((c) => ({
+      ...c,
+      challenges: this.db
+        .prepare('SELECT id, slug, title, ord FROM challenges WHERE concept_id = ? ORDER BY ord ASC, id ASC')
+        .all(c.id) as ChallengeSummary[],
+    }))
   }
 }
