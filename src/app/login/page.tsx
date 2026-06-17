@@ -24,20 +24,24 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{ maxWidth: 360, margin: '4rem auto', fontFamily: 'system-ui' }}>
-      <h1>Entrar</h1>
-      <form onSubmit={submit}>
-        <input
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Tu nombre de usuario"
-          style={{ width: '100%', padding: 8, fontSize: 16 }}
-        />
-        <button type="submit" style={{ marginTop: 12, padding: '8px 16px' }}>
-          Entrar
-        </button>
-      </form>
-      {error && <p style={{ color: 'crimson' }}>{error}</p>}
+    <main className="page page--narrow">
+      <div className="card welcome-card">
+        <div className="mascot">🚀🦊</div>
+        <h1>Fab Lab Quest</h1>
+        <p>¡Hola! ¿Cómo te llamas?</p>
+        <form onSubmit={submit}>
+          <div className="field">
+            <input
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Tu nombre de usuario"
+              autoFocus
+            />
+          </div>
+          <button type="submit">¡Entrar! →</button>
+        </form>
+        {error && <p className="error">{error}</p>}
+      </div>
     </main>
   )
 }
