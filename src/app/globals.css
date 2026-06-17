@@ -411,3 +411,60 @@ textarea {
 .welcome-card .mascot {
   font-size: 3rem;
 }
+
+/* Barra de progreso */
+.progress-bar {
+  height: 8px;
+  background: #f0e6e6;
+  border-radius: 999px;
+  overflow: hidden;
+  width: 80px;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+/* Sección de concepto en dashboard */
+.concept-section {
+  background: var(--card);
+  border: 3px solid var(--violet);
+  border-radius: var(--radius);
+  box-shadow: 0 5px 0 var(--violet-dark);
+  padding: 1.25rem;
+}
+
+.concept-section--locked {
+  border-color: #ddd;
+  box-shadow: 0 5px 0 #ccc;
+  opacity: 0.6;
+}
+
+.concept-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.concept-section__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.concept-section__count {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.challenge__num {
+  color: var(--text-dim);
+  font-weight: 700;
+  margin-right: 0.25rem;
+}

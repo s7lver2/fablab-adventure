@@ -7,7 +7,14 @@ import { ProgressRepository } from '@/lib/progress/repository'
 import { getCurrentUser } from '@/lib/session/server'
 import { nextChallengeSlug } from '@/lib/progress/next'
 import { AppBar } from '@/components/AppBar'
-import { ChallengeRow } from '@/components/ChallengeRow'
+import { StatCard } from '@/components/StatCard'
+import { ConceptSection } from '@/components/ConceptSection'
+
+const LANG_LABEL: Record<string, string> = {
+  js: '⚡ JavaScript',
+  python: '🐍 Python',
+  blocks: '🧩 Bloques',
+}
 
 export default async function HomePage() {
   const db = getDb()
@@ -17,58 +24,72 @@ export default async function HomePage() {
 
   const curriculum = new CurriculumRepository(db)
   const progress = new ProgressRepository(db)
-  const challenges = curriculum.listChallenges()
+  const concepts = curriculum.listConceptsWithChallenges()
+  const allChallenges = concepts.flatMap((c) => c.challenges)
   const completed = new Set(progress.completedChallengeIds(user.id))
-  const next = nextChallengeSlug(challenges, [...completed])
+  const next = nextChallengeSlug(allChallenges, [...completed])
 
-  // Estrellas por reto (derivado de progress, dato existente)
   const starsById = new Map<number, number>()
-  for (const c of challenges) {
+  for (const c of allChallenges) {
     starsById.set(c.id, progress.get(user.id, c.id)?.stars ?? 0)
   }
   const totalStars = [...starsById.values()].reduce((a, b) => a + b, 0)
   const challengesDone = completed.size
+  const nextChallenge = allChallenges.find((c) => c.slug === next)
 
   return (
     <main className="page">
       <AppBar avatar={user.avatar} displayName={user.displayName} />
 
       <div className="greeting">
-        <h1>¡Hola, {user.displayName}! 👋</h1>
-        <span className="chip">⭐ {totalStars} · 🏆 {challengesDone}</span>
+        <div>
+          <h1>¡Hola, {user.displayName}!</h1>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)', fontWeight: 700 }}>
+            {user.chosenLanguage ? LANG_LABEL[user.chosenLanguage] : ''}
+          </span>
+        </div>
       </div>
 
-      {next && (
+      <div className="stats-row">
+        <StatCard label="Estrellas" value={`⭐ ${totalStars}`} />
+        <StatCard label="Completados" value={`🏆 ${challengesDone}`} />
+        <StatCard
+          label="Progreso"
+          value={`${allChallenges.length > 0 ? Math.round((challengesDone / allChallenges.length) * 100) : 0}%`}
+        />
+      </div>
+
+      {next && nextChallenge && (
         <div className="mission">
           <div>
             <h2>Siguiente misión</h2>
-            <p>¡Tu próxima aventura te espera!</p>
+            <p>{nextChallenge.title}</p>
           </div>
-          <Link href={`/challenge/${next}`} className="btn">
-            ¡Jugar!
-          </Link>
+          <Link href={`/challenge/${next}`} className="btn">¡Jugar!</Link>
         </div>
       )}
 
-      <h2>Tu aventura</h2>
-      <ol className="challenge-list">
-        {challenges.map((c) => {
-          const state: 'done' | 'current' | 'future' = completed.has(c.id)
-            ? 'done'
-            : c.slug === next
-              ? 'current'
-              : 'future'
-          return (
-            <ChallengeRow
-              key={c.id}
-              title={c.title}
-              href={`/challenge/${c.slug}`}
-              state={state}
-              stars={starsById.get(c.id) ?? 0}
-            />
-          )
-        })}
-      </ol>
+      {!next && challengesDone > 0 && (
+        <div className="mission" style={{ borderColor: 'var(--green)', boxShadow: '0 5px 0 var(--green-dark)' }}>
+          <div>
+            <h2>🎉 ¡Curso completado!</h2>
+            <p>Has terminado todos los retos. ¡Eres increíble!</p>
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1rem' }}>
+        {concepts.map((concept) => (
+          <ConceptSection
+            key={concept.id}
+            name={concept.name}
+            challenges={concept.challenges}
+            completed={completed}
+            stars={starsById}
+            next={next}
+          />
+        ))}
+      </div>
     </main>
   )
 }
