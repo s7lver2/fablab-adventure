@@ -1,16 +1,24 @@
 :root {
-  --bg: #0f1117;
-  --surface: #181b24;
-  --surface-2: #1f232e;
-  --border: #2a2f3a;
-  --text: #e6e8ee;
-  --text-dim: #9aa1ad;
-  --accent: #5b8cff;
-  --accent-hover: #6f9bff;
-  --ok: #3fb950;
-  --radius: 10px;
+  /* Fondo degradado cálido */
+  --bg-1: #fff7ed;
+  --bg-2: #ffe4e6;
+  --bg-3: #ede9fe;
+
+  /* Acentos */
+  --amber: #fbbf24;
+  --amber-dark: #f59e0b;
+  --green: #34d399;
+  --green-dark: #059669;
+  --violet: #a78bfa;
+  --violet-dark: #7c3aed;
+
+  --text: #3b2f2f;
+  --text-dim: #7c6f6f;
+  --card: #fff;
+
+  --radius: 20px;
+  --radius-sm: 14px;
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "SF Mono", "JetBrains Mono", "Cascadia Code", Consolas, monospace;
 }
 
 * {
@@ -27,85 +35,108 @@ body {
 body {
   min-height: 100vh;
   color: var(--text);
-  background:
-    radial-gradient(1200px 600px at 50% -200px, #1a2030 0%, transparent 70%),
-    var(--bg);
+  background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+  background-attachment: fixed;
   font-family: var(--font-sans);
-  line-height: 1.55;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-main {
-  padding: 1.5rem;
-}
-
-/* Tipografía */
 h1 {
-  font-size: 1.6rem;
-  font-weight: 700;
+  font-size: 1.8rem;
+  font-weight: 900;
   letter-spacing: -0.01em;
-  margin-bottom: 0.75rem;
+  color: var(--text);
 }
 
-h1 + p,
+h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
 p {
   color: var(--text-dim);
 }
 
-p {
-  margin-bottom: 0.6rem;
-}
-
-p strong {
-  color: var(--text);
-}
-
-/* Enlaces */
 a {
-  color: var(--accent);
+  color: var(--violet-dark);
   text-decoration: none;
-  transition: color 0.15s ease;
+  font-weight: 700;
 }
 
-a:hover {
-  color: var(--accent-hover);
-  text-decoration: underline;
+/* Contenedores de página */
+.page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 1.25rem;
 }
 
-/* Listas (currículo) */
-ol,
-ul {
-  list-style: none;
+.page--narrow {
+  max-width: 420px;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  justify-content: center;
+  min-height: 100vh;
 }
 
-ol li,
-ul li {
-  background: var(--surface);
-  border: 1px solid var(--border);
+/* Tarjeta genérica: blanca, redondeada, borde grueso, sombra-botón */
+.card {
+  background: var(--card);
+  border: 3px solid var(--violet);
   border-radius: var(--radius);
-  padding: 0.75rem 1rem;
-  transition: border-color 0.15s ease, transform 0.1s ease;
+  box-shadow: 0 5px 0 var(--violet-dark);
+  padding: 1.25rem;
 }
 
-ol li:hover,
-ul li:hover {
-  border-color: var(--accent);
+/* Botones: relleno de color + sombra inferior sólida */
+button,
+.btn {
+  background: var(--amber);
+  color: #3b2f2f;
+  border: none;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 0 var(--amber-dark);
+  padding: 0.7rem 1.3rem;
+  font-size: 1rem;
+  font-weight: 800;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: transform 0.05s ease, box-shadow 0.05s ease;
 }
 
-/* Formularios */
+button:hover,
+.btn:hover {
+  filter: brightness(1.03);
+}
+
+button:active,
+.btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--amber-dark);
+}
+
+.btn-secondary {
+  background: #fff;
+  color: var(--violet-dark);
+  box-shadow: 0 4px 0 var(--violet);
+  border: 2px solid var(--violet);
+}
+
+.btn-secondary:active {
+  box-shadow: 0 0 0 var(--violet);
+}
+
+/* Campos de formulario */
 input,
 textarea {
   width: 100%;
-  background: var(--surface-2);
+  background: #fff;
   color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.6rem 0.8rem;
+  border: 2px solid #f0e6e6;
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.9rem;
   font-size: 1rem;
   font-family: var(--font-sans);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -114,66 +145,268 @@ textarea {
 input:focus,
 textarea:focus {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(91, 140, 255, 0.2);
+  border-color: var(--violet);
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.3);
 }
 
-label {
-  display: block;
-  color: var(--text-dim);
-  font-size: 0.9rem;
+textarea {
+  resize: vertical;
+  min-height: 4.5rem;
+  line-height: 1.5;
+}
+
+.field {
   margin-bottom: 1rem;
 }
 
-/* El editor de código y la consola: aspecto monoespaciado */
-textarea {
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  line-height: 1.5;
-  resize: vertical;
-}
-
-/* Botones */
-button {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius);
-  padding: 0.55rem 1.1rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  font-family: var(--font-sans);
-  cursor: pointer;
-  transition: background 0.15s ease, transform 0.05s ease;
-}
-
-button:hover {
-  background: var(--accent-hover);
-}
-
-button:active {
-  transform: translateY(1px);
-}
-
-/* Botones secundarios (todos menos el primero de una fila de acciones) */
-button + button {
-  background: var(--surface-2);
+.field__label {
+  display: block;
+  font-weight: 700;
   color: var(--text);
-  border: 1px solid var(--border);
+  margin-bottom: 0.35rem;
 }
 
-button + button:hover {
-  background: var(--border);
+.char-count {
+  font-weight: 400;
+  color: var(--text-dim);
+  font-size: 0.85rem;
 }
 
-/* Salida de consola */
-pre {
-  background: #0a0c11 !important;
-  color: var(--ok) !important;
-  border: 1px solid var(--border);
+.error {
+  color: #dc2626;
+  font-weight: 700;
+  margin-top: 0.75rem;
+}
+
+/* AppBar */
+.appbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.appbar__brand {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--violet-dark);
+}
+
+.appbar__profile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  background: #fff;
+  border: 3px solid var(--amber);
+  border-radius: 50%;
+  box-shadow: 0 4px 0 var(--amber-dark);
+}
+
+/* Saludo + chip resumen */
+.greeting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.chip {
+  background: #fff;
+  border: 2px solid var(--green);
+  box-shadow: 0 3px 0 var(--green-dark);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-weight: 800;
+  color: var(--green-dark);
+  white-space: nowrap;
+}
+
+/* Bloque "siguiente misión" */
+.mission {
+  background: var(--card);
+  border: 3px solid var(--amber);
   border-radius: var(--radius);
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  white-space: pre-wrap;
-  word-break: break-word;
+  box-shadow: 0 5px 0 var(--amber-dark);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Estrellas */
+.stars {
+  display: inline-flex;
+  gap: 2px;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.star {
+  opacity: 1;
+}
+
+.star--off {
+  opacity: 0.3;
+}
+
+/* Stat cards */
+.stats-row {
+  display: flex;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+}
+
+.stat-card {
+  flex: 1;
+  background: #fff;
+  border: 3px solid var(--green);
+  border-radius: var(--radius);
+  box-shadow: 0 5px 0 var(--green-dark);
+  padding: 1rem;
+  text-align: center;
+}
+
+.stat-card__value {
+  font-size: 1.9rem;
+  font-weight: 900;
+  color: var(--green-dark);
+}
+
+.stat-card__label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+/* Lista de retos */
+.challenge-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.challenge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: #fff;
+  border: 2px solid #f0e6e6;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 4px 0 #e7dada;
+  padding: 0.9rem 1.1rem;
+  color: var(--text);
+}
+
+.challenge__title {
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.challenge__cta {
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.challenge--done {
+  border-color: var(--green);
+  box-shadow: 0 4px 0 var(--green-dark);
+}
+
+.challenge--current {
+  border-color: var(--amber);
+  box-shadow: 0 5px 0 var(--amber-dark);
+}
+
+.challenge--future {
+  opacity: 0.55;
+}
+
+/* Tarjeta de perfil */
+.profile-card {
+  position: relative;
+  text-align: center;
+}
+
+.profile-card__avatar {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 0.75rem;
+  display: grid;
+  place-items: center;
+  font-size: 3rem;
+  background: #fff;
+  border: 3px solid var(--violet);
+  border-radius: 50%;
+  box-shadow: 0 5px 0 var(--violet-dark);
+}
+
+.profile-card__name {
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+.profile-card__msg {
+  color: var(--text-dim);
+  margin-top: 0.35rem;
+}
+
+.profile-card__edit {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 1.1rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 3px 0 var(--violet);
+  border: 2px solid var(--violet);
+}
+
+/* Lista de logros */
+.achievement-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.achievement {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: #fff;
+  border: 2px solid var(--green);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 3px 0 var(--green-dark);
+  padding: 0.7rem 1rem;
+  font-weight: 700;
+}
+
+/* Login */
+.welcome-card {
+  text-align: center;
+}
+
+.welcome-card .mascot {
+  font-size: 3rem;
 }
