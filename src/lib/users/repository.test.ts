@@ -40,4 +40,14 @@ describe('UserRepository', () => {
     const repo = freshRepo()
     expect(() => repo.findOrCreateByUsername('root')).toThrow()
   })
+
+  it('verifica la contraseña del root sembrado y permite cambiarla', () => {
+    const db = new Database(':memory:')
+    createSchema(db)
+    const repo = new UserRepository(db)
+    expect(repo.verifyPassword('root', 'changeme')).toBe(true)
+    expect(repo.verifyPassword('root', 'mal')).toBe(false)
+    repo.setPassword('root', 'nueva')
+    expect(repo.verifyPassword('root', 'nueva')).toBe(true)
+  })
 })

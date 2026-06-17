@@ -10,6 +10,13 @@ export async function POST(req: Request) {
   }
   try {
     const repo = new UserRepository(getDb())
+    const existing = repo.findByUsername(username.trim().toLowerCase())
+    if (existing && existing.role !== 'user') {
+      return NextResponse.json(
+        { error: 'Esta cuenta es de administración. Entra por el acceso de admin.' },
+        { status: 403 },
+      )
+    }
     const user = repo.findOrCreateByUsername(username)
     await setSessionCookie(user.id)
     return NextResponse.json({ ok: true, user: { username: user.username, displayName: user.displayName } })

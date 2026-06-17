@@ -1,5 +1,6 @@
 import type Database from 'better-sqlite3'
 import type { ProfileUpdate, Role, User } from './types'
+import { hashPassword, verifyPassword as verifyHash } from '../auth/password'
 
 interface UserRow {
   id: number
@@ -68,5 +69,19 @@ export class UserRepository {
         'UPDATE users SET display_name = ?, avatar = ?, profile_message = ? WHERE id = ? AND role = (SELECT role FROM users WHERE id = ?)',
       )
       .run(update.displayName, update.avatar, update.profileMessage, id, id)
+  }
+
+  verifyPassword(username: string, plain: string): boolean {
+    const row = this.db
+      .prepare('SELECT password_hash FROM users WHERE username = ?')
+      .get(username.trim().toLowerCase()) as { password_hash: string | null } | undefined
+    if (!row?.password_hash) return false
+    return verifyHash(plain, row.password_hash)
+  }
+
+  setPassword(username: string, plain: string): void {
+    this.db
+      .prepare('UPDATE users SET password_hash = ? WHERE username = ?')
+      .run(hashPassword(plain), username.trim().toLowerCase())
   }
 }
