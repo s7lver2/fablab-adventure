@@ -90,4 +90,13 @@ export class AppealRepository {
       .get(userId, challengeId) as { t: number | null }
     return row.t ?? null
   }
+
+  resolve(id: number, status: 'accepted' | 'rejected', feedback: string, reviewerId: number): void {
+    this.db
+      .prepare(
+        `UPDATE review_requests SET status = ?, reviewer_admin_id = ?, feedback = ?, resolved_at = ?
+         WHERE id = ?`,
+      )
+      .run(status, reviewerId, feedback, Date.now(), id)
+  }
 }
