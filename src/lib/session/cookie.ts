@@ -1,4 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
+import type Database from 'better-sqlite3'
+import type { User } from '../users/types'
 
 export interface SessionPayload {
   userId: number
@@ -28,5 +30,25 @@ export function verifySession(token: string, secret: string): SessionPayload | n
     return { userId: parsed.userId }
   } catch {
     return null
+  }
+}
+
+/** Resuelve el usuario a partir del token de sesión. Usado en middleware para decidir bloqueos. */
+export function resolveUserFromCookie(db: Database.Database, token: string): User | null {
+  const secret = process.env.SESSION_SECRET || ''
+  const payload = verifySession(token, secret)
+  if (!payload) return null
+  const row = db.prepare('SELECT * FROM users WHERE id = ?').get(payload.userId) as any
+  if (!row) return null
+  return {
+    id: row.id,
+    username: row.username,
+    displayName: row.display_name,
+    avatar: row.avatar || '',
+    profileMessage: row.profile_message || '',
+    role: row.role,
+    hidden: row.hidden,
+    createdAt: row.created_at,
+    lastSeen: row.last_seen,
   }
 }

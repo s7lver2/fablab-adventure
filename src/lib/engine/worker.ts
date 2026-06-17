@@ -8,6 +8,5 @@ export interface WorkerRequest {
 self.onmessage = (e: MessageEvent<WorkerRequest>) => {
   const { code, input } = e.data
   const result = runJs(code, input)
-  // @ts-expect-error postMessage del contexto worker
   self.postMessage(result)
 }

@@ -32,11 +32,13 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
 
   async function run() {
     // Ejecuta contra la primera entrada para que el alumno vea su salida.
+    if (!data) return
     const res = await runInWorker(code, data.inputs[0])
     setConsoleOut(res.error ? res.error : res.output)
   }
 
   async function submit() {
+    if (!data) return
     const outputs: string[] = []
     for (const input of data.inputs) {
       const res = await runInWorker(code, input)
