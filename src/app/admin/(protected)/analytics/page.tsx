@@ -1,134 +1,129 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import Chart from 'chart.js/auto'
 
-interface AnalyticsData {
-  summary: {
-    totalEvents: number
-    sessions: number
-    activeUsers: number
-    bounceSessions: number
-    avgSessionMs: number
-    byHour: number[]
-  }
-  devices: Record<string, number>
-  browsers: Record<string, number>
-  stuck: Array<{ challengeId: number; challengeTitle: string; current: number; avgAttempts: number }>
+interface Summary { totalEvents: number; sessions: number; activeUsers: number; bounceSessions: number; avgSessionMs: number; byHour: number[] }
+interface StuckRow { challengeId: number; challengeTitle: string; current: number }
+interface AnalyticsData { summary: Summary; devices: Record<string, number>; browsers: Record<string, number>; stuck: StuckRow[] }
+
+function sec(children: React.ReactNode) {
+  return <div style={{ border: '0.5px solid var(--color-border-tertiary)', borderRadius: 'var(--border-radius-lg)', overflow: 'hidden' }}>{children}</div>
 }
 
-export default function AnalyticsPage() {
-  const [data, setData] = useState<AnalyticsData | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetch('/api/admin/analytics')
-      .then((r) => r.json())
-      .then(setData)
-      .finally(() => setLoading(false))
-  }, [])
-
-  if (loading) return <div style={{ padding: '1rem' }}>Cargando analítica...</div>
-  if (!data) return <div style={{ padding: '1rem' }}>Error al cargar datos.</div>
-
-  const { summary, devices, browsers, stuck } = data
-  const bouncePct = summary.sessions > 0 ? Math.round((summary.bounceSessions / summary.sessions) * 100) : 0
-  const avgMinutes = Math.round(summary.avgSessionMs / 1000 / 60)
-
-  const maxHour = Math.max(...summary.byHour, 1)
-  const barHeight = 10 // líneas de gráfico
-
+function sh(title: string, sub?: string) {
   return (
-    <div style={{ padding: '1.5rem' }}>
-      <h1>Analítica</h1>
-
-      {/* Tarjetas de resumen */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-        <Card title="Eventos totales" value={summary.totalEvents} />
-        <Card title="Sesiones" value={summary.sessions} />
-        <Card title="Usuarios activos" value={summary.activeUsers} />
-        <Card title="Rebote" value={`${bouncePct}%`} />
-        <Card title="Duración media" value={`${avgMinutes} min`} />
-      </div>
-
-      {/* Gráfico de actividad por hora */}
-      <div style={{ marginBottom: '2rem', padding: '1rem', border: '1px solid #ddd', borderRadius: '4px' }}>
-        <h2>Actividad por hora (UTC)</h2>
-        {summary.byHour.map((count, hour) => {
-          const barWidth = Math.max(1, Math.round((count / maxHour) * 50))
-          return (
-            <div key={hour} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', fontFamily: 'monospace', fontSize: '0.9rem' }}>
-              <div style={{ width: '3rem', textAlign: 'right' }}>{String(hour).padStart(2, '0')}:00</div>
-              <div style={{ height: '20px', width: `${barWidth}px`, backgroundColor: '#4a9eff', borderRadius: '2px' }} />
-              <div>{count}</div>
-            </div>
-          )
-        })}
-      </div>
-
-      {/* Tabla de dispositivos y navegadores */}
-      <div style={{ marginBottom: '2rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-        <div style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '4px' }}>
-          <h2>Dispositivos</h2>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <tbody>
-              {Object.entries(devices).sort(([, a], [, b]) => b - a).map(([device, count]) => (
-                <tr key={device}>
-                  <td style={{ padding: '0.5rem', borderBottom: '1px solid #eee' }}>{device}</td>
-                  <td style={{ padding: '0.5rem', borderBottom: '1px solid #eee', textAlign: 'right' }}>{count}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '4px' }}>
-          <h2>Navegadores</h2>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <tbody>
-              {Object.entries(browsers).sort(([, a], [, b]) => b - a).map(([browser, count]) => (
-                <tr key={browser}>
-                  <td style={{ padding: '0.5rem', borderBottom: '1px solid #eee' }}>{browser}</td>
-                  <td style={{ padding: '0.5rem', borderBottom: '1px solid #eee', textAlign: 'right' }}>{count}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Tabla de "dónde se atascan" */}
-      <div style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '4px' }}>
-        <h2>Dónde se atascan los alumnos</h2>
-        {stuck.length === 0 ? (
-          <p>No hay datos de progreso aún.</p>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '2px solid #ddd' }}>
-                <th style={{ padding: '0.5rem', textAlign: 'left' }}>Reto</th>
-                <th style={{ padding: '0.5rem', textAlign: 'center' }}>Atascos</th>
-                <th style={{ padding: '0.5rem', textAlign: 'center' }}>Intentos (media)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stuck.sort((a, b) => b.current - a.current).map((s) => (
-                <tr key={s.challengeId} style={{ borderBottom: '1px solid #eee' }}>
-                  <td style={{ padding: '0.5rem' }}>{s.challengeTitle}</td>
-                  <td style={{ padding: '0.5rem', textAlign: 'center' }}>{s.current}</td>
-                  <td style={{ padding: '0.5rem', textAlign: 'center' }}>{s.avgAttempts.toFixed(1)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+    <div style={{ padding: '0.75rem 1rem', borderBottom: '0.5px solid var(--color-border-tertiary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)' }}>{title}</span>
+      {sub && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)' }}>{sub}</span>}
     </div>
   )
 }
 
-function Card({ title, value }: { title: string; value: string | number }) {
+export default function AnalyticsPage() {
+  const [data, setData] = useState<AnalyticsData | null>(null)
+  const hourlyRef = useRef<HTMLCanvasElement>(null)
+  const conceptsRef = useRef<HTMLCanvasElement>(null)
+  const hourlyChart = useRef<Chart | null>(null)
+  const conceptsChart = useRef<Chart | null>(null)
+
+  useEffect(() => {
+    fetch('/api/admin/analytics').then((r) => r.json()).then(setData)
+  }, [])
+
+  useEffect(() => {
+    if (!data || !hourlyRef.current || !conceptsRef.current) return
+    hourlyChart.current?.destroy()
+    conceptsChart.current?.destroy()
+
+    const style = getComputedStyle(document.documentElement)
+    const grd = style.getPropertyValue('--color-border-tertiary').trim()
+    const txt = style.getPropertyValue('--color-text-secondary').trim()
+    const scale = { grid: { color: grd }, border: { display: false as const }, ticks: { color: txt, font: { family: 'monospace', size: 10 } } }
+
+    hourlyChart.current = new Chart(hourlyRef.current.getContext('2d')!, {
+      type: 'bar',
+      data: {
+        labels: Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0')),
+        datasets: [{ data: data.summary.byHour, backgroundColor: '#1D9E75', borderRadius: 2, borderWidth: 0 }],
+      },
+      options: { animation: false, plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
+    })
+
+    conceptsChart.current = new Chart(conceptsRef.current.getContext('2d')!, {
+      type: 'bar',
+      data: {
+        labels: ['Fundamentos', 'Condicionales', 'Bucles', 'Funciones'],
+        datasets: [{ data: [5, 4, 4, 3], backgroundColor: ['#1D9E75', '#185FA5', '#BA7517', '#A32D2D'], borderRadius: 3, borderWidth: 0 }],
+      },
+      options: { animation: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
+    })
+
+    return () => { hourlyChart.current?.destroy(); conceptsChart.current?.destroy() }
+  }, [data])
+
+  if (!data) return <div style={{ padding: '1.25rem', fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-text-secondary)' }}>Cargando…</div>
+
+  const bouncePct = data.summary.sessions > 0 ? Math.round((data.summary.bounceSessions / data.summary.sessions) * 100) : 0
+  const avgMin = Math.round(data.summary.avgSessionMs / 60_000)
+
   return (
-    <div style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '4px', textAlign: 'center' }}>
-      <div style={{ fontSize: '0.9rem', color: '#666' }}>{title}</div>
-      <div style={{ fontSize: '1.8rem', fontWeight: 'bold', marginTop: '0.5rem' }}>{value}</div>
+    <div style={{ padding: '1.25rem' }}>
+      <div style={{ marginBottom: '1rem' }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>métricas</div>
+        <div style={{ fontSize: 17, fontWeight: 500, color: 'var(--color-text-primary)' }}>Analítica</div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,minmax(0,1fr))', gap: 8, marginBottom: '1rem' }}>
+        {[
+          { label: 'eventos totales', value: data.summary.totalEvents },
+          { label: 'sesiones únicas', value: data.summary.sessions },
+          { label: 'tasa de rebote', value: `${bouncePct}%` },
+          { label: 'duración media', value: `${avgMin} min` },
+        ].map((k) => (
+          <div key={k.label} style={{ background: 'var(--color-background-secondary)', borderRadius: 'var(--border-radius-md)', padding: '0.875rem' }}>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', marginBottom: 6 }}>{k.label}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 20, fontWeight: 500, color: 'var(--color-text-primary)' }}>{k.value}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginBottom: 8 }}>
+        {sec(<>{sh('Actividad por hora del día (UTC)', 'hoy')}<div style={{ padding: '0.75rem' }}><canvas ref={hourlyRef} height={130}></canvas></div></>)}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
+        {sec(<>{sh('Retos por concepto')}<div style={{ padding: '0.75rem' }}><canvas ref={conceptsRef} height={140}></canvas></div></>)}
+        {sec(<>
+          {sh('Dónde se atascan')}
+          {data.stuck.length === 0 && <div style={{ padding: '0.75rem 1rem', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-secondary)' }}>Sin datos de progreso aún</div>}
+          {data.stuck.sort((a, b) => b.current - a.current).slice(0, 5).map((s) => (
+            <div key={s.challengeId} style={{ padding: '0.55rem 1rem', borderBottom: '0.5px solid var(--color-border-tertiary)', display: 'flex', alignItems: 'center', gap: 10, fontSize: 12 }}>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-success)', flex: 1 }}>{s.challengeTitle}</span>
+              <div style={{ width: 70, height: 3, background: 'var(--color-border-tertiary)', borderRadius: 99 }}>
+                <div style={{ width: `${Math.min(100, s.current * 10)}%`, height: '100%', background: 'var(--color-text-danger)', borderRadius: 99 }} />
+              </div>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', minWidth: 20, textAlign: 'right' }}>{s.current}</span>
+            </div>
+          ))}
+        </>)}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+        {(['Dispositivos', 'Navegadores'] as const).map((title) => {
+          const d = title === 'Dispositivos' ? data.devices : data.browsers
+          return (
+            <div key={title} style={{ border: '0.5px solid var(--color-border-tertiary)', borderRadius: 'var(--border-radius-lg)', overflow: 'hidden' }}>
+              {sh(title)}
+              {Object.entries(d).sort(([, a], [, b]) => b - a).slice(0, 5).map(([name, count]) => (
+                <div key={name} style={{ padding: '0.5rem 1rem', borderBottom: '0.5px solid var(--color-border-tertiary)', display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                  <span style={{ color: 'var(--color-text-primary)' }}>{name || '—'}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-secondary)' }}>{count}</span>
+                </div>
+              ))}
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
