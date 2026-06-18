@@ -13,6 +13,7 @@ const SOLUTIONS: Record<string, string> = {
   'caja-cuenta': 'let a = 5\nlet b = 3\nprint(a + b)',
   'juntar-textos': 'let nombre = "Lia"\nprint("Hola, " + nombre + ". ¿Qué tal?")',
   'mi-nombre': 'let nombre = "Mundo"\nprint("Hola, " + nombre)',
+  'que-es-input': 'print("Tu número es " + input.n)',
   suma: 'print(input.a + input.b)',
   doble: 'print(input.n * 2)',
   contar: 'for (let i = 1; i <= input.hasta; i++) {\n  print("Hola " + i)\n}',
