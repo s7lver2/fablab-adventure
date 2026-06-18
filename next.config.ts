@@ -1,13 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  webpack: (config, { isServer }) => {
-    config.worker = {
-      ...config.worker,
-      output: 'worker.js',
-    }
-    return config
-  },
+  turbopack: {},
 };
 
 export default nextConfig;
