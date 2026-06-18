@@ -1,47 +1,41 @@
 'use client'
 import { useState } from 'react'
-import { ProfileCard } from '@/components/ProfileCard'
-import { StatCard } from '@/components/StatCard'
-import { StarRating } from '@/components/StarRating'
+import { ProfileLayout } from '@/components/profile/ProfileLayout'
+import { BANNER_PRESETS } from '@/lib/users/banners'
+import type { PublicProfile } from '@/lib/users/profileStats'
 
-interface Achievement {
-  title: string
-  stars: number
-}
-
-export function ProfileView({
-  initialDisplayName,
-  initialAvatar,
-  initialProfileMessage,
-  totalStars,
-  challengesDone,
-  achievements,
-}: {
-  initialDisplayName: string
-  initialAvatar: string
-  initialProfileMessage: string
-  totalStars: number
-  challengesDone: number
-  achievements: Achievement[]
-}) {
-  const [displayName, setDisplayName] = useState(initialDisplayName)
-  const [avatar, setAvatar] = useState(initialAvatar)
-  const [profileMessage, setProfileMessage] = useState(initialProfileMessage)
+export function ProfileView({ profile }: { profile: PublicProfile }) {
+  const [displayName, setDisplayName] = useState(profile.displayName)
+  const [avatar, setAvatar] = useState(profile.avatar)
+  const [profileMessage, setProfileMessage] = useState(profile.profileMessage)
+  const [banner, setBanner] = useState(profile.banner || 'preset:sunset')
+  const [bannerImage, setBannerImage] = useState<string | null>(profile.bannerImage)
   const [editing, setEditing] = useState(false)
   const [error, setError] = useState('')
   const [resetting, setResetting] = useState(false)
 
-  // Borradores para poder cancelar sin perder los valores guardados
-  const [draftName, setDraftName] = useState(displayName)
-  const [draftAvatar, setDraftAvatar] = useState(avatar)
-  const [draftMessage, setDraftMessage] = useState(profileMessage)
+  const [d, setD] = useState({ displayName, avatar, profileMessage, banner, bannerImage })
 
   function openEdit() {
-    setDraftName(displayName)
-    setDraftAvatar(avatar)
-    setDraftMessage(profileMessage)
+    setD({ displayName, avatar, profileMessage, banner, bannerImage })
     setError('')
     setEditing(true)
+  }
+
+  function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!/^image\/(png|jpeg|jpg|webp|gif)$/.test(file.type)) {
+      setError('Formato de imagen no válido.')
+      return
+    }
+    if (file.size > 500 * 1024) {
+      setError('La imagen supera los 500 KB.')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => setD((s) => ({ ...s, banner: 'upload', bannerImage: String(reader.result) }))
+    reader.readAsDataURL(file)
   }
 
   async function save(e: React.FormEvent) {
@@ -50,20 +44,18 @@ export function ProfileView({
     const res = await fetch('/api/me', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        displayName: draftName,
-        avatar: draftAvatar,
-        profileMessage: draftMessage,
-      }),
+      body: JSON.stringify(d),
     })
     const data = await res.json()
     if (!res.ok) {
       setError(data.error ?? 'No se pudo guardar.')
       return
     }
-    setDisplayName(draftName)
-    setAvatar(draftAvatar)
-    setProfileMessage(draftMessage)
+    setDisplayName(d.displayName)
+    setAvatar(d.avatar)
+    setProfileMessage(d.profileMessage)
+    setBanner(d.banner)
+    setBannerImage(d.bannerImage)
     setEditing(false)
   }
 
@@ -81,21 +73,60 @@ export function ProfileView({
         <form onSubmit={save}>
           <div className="field">
             <label className="field__label">Nombre</label>
-            <input value={draftName} onChange={(e) => setDraftName(e.target.value)} />
+            <input value={d.displayName} onChange={(e) => setD((s) => ({ ...s, displayName: e.target.value }))} />
           </div>
           <div className="field">
             <label className="field__label">Avatar (un emoji)</label>
-            <input value={draftAvatar} onChange={(e) => setDraftAvatar(e.target.value)} />
+            <input value={d.avatar} onChange={(e) => setD((s) => ({ ...s, avatar: e.target.value }))} />
           </div>
           <div className="field">
             <label className="field__label">
-              Mensaje <span className="char-count">({draftMessage.length}/100)</span>
+              Mensaje <span className="char-count">({d.profileMessage.length}/100)</span>
             </label>
             <textarea
-              value={draftMessage}
+              value={d.profileMessage}
               maxLength={100}
-              onChange={(e) => setDraftMessage(e.target.value)}
+              onChange={(e) => setD((s) => ({ ...s, profileMessage: e.target.value }))}
             />
+          </div>
+          <div className="field">
+            <label className="field__label">Banner</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+              {BANNER_PRESETS.map((p) => {
+                const selected = d.banner === `preset:${p.id}`
+                return (
+                  <button
+                    type="button"
+                    key={p.id}
+                    onClick={() => setD((s) => ({ ...s, banner: `preset:${p.id}`, bannerImage: null }))}
+                    title={p.label}
+                    style={{
+                      height: 36,
+                      borderRadius: 10,
+                      background: p.css,
+                      border: selected ? '3px solid var(--violet-dark)' : '2px solid #f0e6e6',
+                      boxShadow: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  />
+                )
+              })}
+            </div>
+            <label className="field__label" style={{ marginTop: 10 }}>
+              O sube una imagen (máx. 500 KB)
+            </label>
+            <input type="file" accept="image/*" onChange={onPickFile} style={{ boxShadow: 'none' }} />
+            {d.banner === 'upload' && d.bannerImage && (
+              <div
+                style={{
+                  height: 60,
+                  marginTop: 8,
+                  borderRadius: 10,
+                  background: `center / cover no-repeat url("${d.bannerImage}")`,
+                }}
+              />
+            )}
           </div>
           <button type="submit">Guardar</button>{' '}
           <button type="button" className="btn-secondary" onClick={() => setEditing(false)}>
@@ -107,51 +138,33 @@ export function ProfileView({
     )
   }
 
+  const local: PublicProfile = { ...profile, displayName, avatar, profileMessage, banner, bannerImage }
+
   return (
     <>
-      <ProfileCard
-        avatar={avatar}
-        displayName={displayName}
-        profileMessage={profileMessage}
+      <ProfileLayout
+        profile={local}
         action={
           <button
             type="button"
-            className="profile-card__edit"
-            aria-label="Editar perfil"
+            className="btn-secondary"
             onClick={openEdit}
+            style={{ padding: '6px 14px', fontSize: '.85rem' }}
           >
-            ✏️
+            ✏️ Editar perfil
           </button>
         }
       />
-
-      <div className="stats-row">
-        <StatCard value={totalStars} label="Estrellas" />
-        <StatCard value={challengesDone} label="Retos hechos" />
+      <div className="pf-wrap">
+        <button
+          onClick={resetLanguage}
+          disabled={resetting}
+          className="btn btn-secondary"
+          style={{ marginTop: '1.25rem', width: '100%' }}
+        >
+          {resetting ? 'Reiniciando…' : '🔄 Cambiar lenguaje (borra progreso)'}
+        </button>
       </div>
-
-      {achievements.length > 0 && (
-        <>
-          <h2>Conseguido</h2>
-          <ul className="achievement-list">
-            {achievements.map((a) => (
-              <li key={a.title} className="achievement">
-                <span>{a.title}</span>
-                <StarRating stars={a.stars} />
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-
-      <button
-        onClick={resetLanguage}
-        disabled={resetting}
-        className="btn btn-secondary"
-        style={{ marginTop: '1.5rem', width: '100%' }}
-      >
-        {resetting ? 'Reiniciando…' : '🔄 Cambiar lenguaje (borra progreso)'}
-      </button>
     </>
   )
 }
