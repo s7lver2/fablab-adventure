@@ -31,6 +31,7 @@ const SOLUTIONS: Record<string, string> = {
   'es-primo': 'function esPrimo(n) {\n  if (n < 2) return false\n  for (let i = 2; i * i <= n; i++) {\n    if (n % i === 0) return false\n  }\n  return true\n}\nprint(esPrimo(input.n) ? "primo" : "no primo")',
   saludo: 'print("Hola mundo")',
   'varias-lineas': 'print("Hola")\nprint("me llamo Robot")\nprint("adiós")',
+  'si-o-no': 'if (input.edad >= 18) {\n  print("mayor")\n} else {\n  print("menor")\n}',
 }
 
 function seededRepo() {
