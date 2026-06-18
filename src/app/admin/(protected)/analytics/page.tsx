@@ -4,10 +4,11 @@ import Chart from 'chart.js/auto'
 import { chartTheme, INDIGO, INDIGO_RAMP, chartAnim, DemoBadge } from '../components/adminUi'
 import { Heatmap } from '../components/Heatmap'
 import { Funnel } from '../components/Funnel'
+import { StackedArea } from '../components/StackedArea'
 
 interface Summary { totalEvents: number; sessions: number; activeUsers: number; bounceSessions: number; avgSessionMs: number; byHour: number[] }
 interface StuckRow { challengeId: number; challengeTitle: string; current: number }
-interface AnalyticsData { summary: Summary; devices: Record<string, number>; browsers: Record<string, number>; stuck: StuckRow[]; byDayHour: number[][]; topPages: { path: string; count: number }[] }
+interface AnalyticsData { summary: Summary; devices: Record<string, number>; browsers: Record<string, number>; stuck: StuckRow[]; byDayHour: number[][]; topPages: { path: string; count: number }[]; pageSeries: { labels: string[]; series: { path: string; data: number[] }[] } }
 
 function sec(children: React.ReactNode) {
   return <div style={{ border: '1px solid var(--adm-border)', borderRadius: 'var(--adm-radius)', overflow: 'hidden' }}>{children}</div>
@@ -138,6 +139,10 @@ export default function AnalyticsPage() {
 
       <div style={{ marginBottom: 8 }}>
         {sec(<>{sh('Páginas más visitadas · embudo', 'eventos')}<div style={{ padding: '0.75rem' }}><Funnel rows={data.topPages} /></div></>)}
+      </div>
+
+      <div style={{ marginBottom: 8 }}>
+        {sec(<>{sh('Tráfico por página · 7 días', '')}<div style={{ padding: '0.75rem' }}><StackedArea labels={data.pageSeries.labels} series={data.pageSeries.series} /></div></>)}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>

@@ -121,6 +121,49 @@ export function createSchema(db: Database.Database): void {
     // columna ya existe
   }
 
+  // Migración idempotente: añadir avatar_image a users
+  try {
+    db.exec("ALTER TABLE users ADD COLUMN avatar_image TEXT")
+  } catch {
+    // columna ya existe
+  }
+
+  // Migración idempotente: añadir tabla de partes de reto
+  try {
+    db.exec(`CREATE TABLE IF NOT EXISTS challenge_parts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      challenge_id INTEGER NOT NULL REFERENCES challenges(id) ON DELETE CASCADE,
+      ord INTEGER NOT NULL)`)
+  } catch {
+    // tabla ya existe
+  }
+
+  // Migración idempotente: añadir part_id a challenge_variants
+  try {
+    db.exec("ALTER TABLE challenge_variants ADD COLUMN part_id INTEGER REFERENCES challenge_parts(id)")
+  } catch {
+    // columna ya existe
+  }
+
+  // Migración idempotente: añadir part_id a test_cases
+  try {
+    db.exec("ALTER TABLE test_cases ADD COLUMN part_id INTEGER REFERENCES challenge_parts(id)")
+  } catch {
+    // columna ya existe
+  }
+
+  // Migración idempotente: añadir tabla de progreso de partes
+  try {
+    db.exec(`CREATE TABLE IF NOT EXISTS challenge_part_progress (
+      user_id INTEGER NOT NULL REFERENCES users(id),
+      part_id INTEGER NOT NULL REFERENCES challenge_parts(id),
+      stars INTEGER NOT NULL DEFAULT 0,
+      completed_at INTEGER,
+      PRIMARY KEY (user_id, part_id))`)
+  } catch {
+    // tabla ya existe
+  }
+
   seedRoot(db)
 }
 

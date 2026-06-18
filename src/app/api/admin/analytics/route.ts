@@ -52,5 +52,6 @@ export async function GET() {
     stuck: stuck.map((s) => ({ ...s, challengeTitle: titleById[s.challengeId] ?? '' })),
     byDayHour: logger.byDayHour(),
     topPages: topPagesResult,
+    pageSeries: logger.pageSeries(),
   })
 }

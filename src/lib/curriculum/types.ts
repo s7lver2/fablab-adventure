@@ -18,10 +18,18 @@ export interface TestCase {
   expectedOutput: string
 }
 
+export interface ChallengePart {
+  id: number
+  ord: number
+  variants: Partial<Record<Language, ChallengeVariant>>
+  testCases: TestCase[]
+}
+
 export interface FullChallenge extends ChallengeSummary {
   narrative: string
   variants: Partial<Record<Language, ChallengeVariant>>
   testCases: TestCase[]
+  parts: ChallengePart[]
 }
 
 export interface ConceptWithChallenges {
