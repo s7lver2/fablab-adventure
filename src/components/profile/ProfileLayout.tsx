@@ -50,13 +50,13 @@ export function ProfileLayout({
 
       {(hasMastery || hasLessons) && (
         <div className="pf-grid2">
+          <RecentLessons lessons={recentLessons} />
           {hasMastery && (
             <div className="pf-card">
-              <h2 className="pf-section-title">Hexagons por concepto</h2>
+              <h2 className="pf-section-title">Hexágono por concepto</h2>
               <Hexagon mastery={mastery} />
             </div>
           )}
-          {hasLessons && <RecentLessons lessons={recentLessons} />}
         </div>
       )}
     </div>

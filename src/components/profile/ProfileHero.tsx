@@ -22,18 +22,20 @@ export function ProfileHero({
   action,
 }: ProfileHeroProps) {
   const avatarContent = profile.avatarImage
-    ? <img src={profile.avatarImage} alt={profile.displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+    ? <img src={profile.avatarImage} alt={profile.displayName} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
     : profile.avatar || '🦊'
 
   return (
-    <div className="pf-card">
+    <div className="pf-card pf-hero">
       <div className="pf-banner" style={{ background: bannerCss(profile.banner || 'preset:sunset', profile.bannerImage || null) }} />
-      <div className="pf-body">
+      <div className="pf-hero-row">
         <div className="pf-avatar">{avatarContent}</div>
-        <h1 className="pf-name">{profile.displayName}</h1>
-        <div className="pf-handle-row">
+        <div className="pf-hero-info">
+          <div className="pf-name-row">
+            <h1 className="pf-name">{profile.displayName}</h1>
+            <BadgeRow badges={badges} />
+          </div>
           <span className="pf-handle">@{profile.username}</span>
-          <BadgeRow badges={badges} />
         </div>
         {action && <div className="pf-action">{action}</div>}
       </div>

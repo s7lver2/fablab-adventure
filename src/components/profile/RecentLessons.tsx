@@ -27,7 +27,7 @@ export function RecentLessons({ lessons }: { lessons: RecentLesson[] }) {
   if (lessons.length === 0) {
     return (
       <div className="pf-card">
-        <h2 className="pf-section-title">Lecciones recientes</h2>
+        <h2 className="pf-section-title">Últimas lecciones</h2>
         <p className="pf-empty">No hay lecciones completadas aún.</p>
       </div>
     )
@@ -35,7 +35,7 @@ export function RecentLessons({ lessons }: { lessons: RecentLesson[] }) {
 
   return (
     <div className="pf-card">
-      <h2 className="pf-section-title">Lecciones recientes</h2>
+      <h2 className="pf-section-title">Últimas lecciones</h2>
       <ul className="pf-lessons">
         {lessons.map((lesson) => (
           <li key={lesson.id} className="pf-lesson">

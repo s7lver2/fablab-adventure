@@ -967,6 +967,74 @@ textarea {
   justify-content: center;
 }
 
+/* ── Horizontal hero variant ─────────────────────────────────── */
+.pf-hero {
+  padding: 0;
+  overflow: hidden;
+}
+
+.pf-hero .pf-banner {
+  height: 96px;
+  margin: 0;
+  border-radius: calc(var(--radius) - 3px) calc(var(--radius) - 3px) 0 0;
+}
+
+.pf-hero-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0 1.5rem 1.25rem;
+}
+
+.pf-hero .pf-avatar {
+  margin: -47px 0 0;
+  flex-shrink: 0;
+}
+
+.pf-hero-info {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  padding-top: 0.85rem;
+}
+
+.pf-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pf-hero .pf-name {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.pf-hero .pf-badges {
+  justify-content: flex-start;
+}
+
+.pf-hero .pf-handle {
+  display: block;
+  margin-top: 0.15rem;
+}
+
+.pf-hero .pf-action {
+  margin: 0;
+  padding-top: 0.85rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .pf-hero-row {
+    flex-wrap: wrap;
+  }
+  .pf-hero .pf-action {
+    width: 100%;
+    padding-top: 0.5rem;
+  }
+}
+
 /* About/Bio text */
 .pf-about {
   text-align: center;
@@ -1021,10 +1089,12 @@ textarea {
 }
 
 .pf-section-title {
-  font-size: 1.2rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  margin-bottom: 1rem;
-  color: var(--text);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
+  color: var(--text-dim);
 }
 
 /* Two-column grid (hexagon + lessons) */
@@ -1051,11 +1121,19 @@ textarea {
   }
 }
 
-/* Hexagon canvas */
-.pf-hexagon-canvas {
+/* Hexagon (SVG radar) */
+.pf-hexagon-svg {
+  display: block;
   width: 100%;
   height: auto;
-  min-height: 250px;
+  max-width: 260px;
+  margin: 0 auto;
+}
+
+.pf-hex-label {
+  font-size: 11px;
+  font-weight: 700;
+  fill: var(--text);
 }
 
 /* Lessons list */
