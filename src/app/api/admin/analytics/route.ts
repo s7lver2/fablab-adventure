@@ -40,11 +40,17 @@ export async function GET() {
   const titleById: Record<number, string> = {}
   for (const c of curriculum.listChallenges()) titleById[c.id] = c.title
 
+  // Top páginas
+  const topPagesResult = db
+    .prepare("SELECT path, COUNT(*) as count FROM events WHERE path IS NOT NULL AND path != '' GROUP BY path ORDER BY count DESC LIMIT 5")
+    .all() as { path: string; count: number }[]
+
   return NextResponse.json({
     summary,
     devices: Object.fromEntries(deviceMap),
     browsers: Object.fromEntries(browserMap),
     stuck: stuck.map((s) => ({ ...s, challengeTitle: titleById[s.challengeId] ?? '' })),
     byDayHour: logger.byDayHour(),
+    topPages: topPagesResult,
   })
 }
