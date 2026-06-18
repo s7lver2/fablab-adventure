@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Chart from 'chart.js/auto'
-import { Card, SectionLabel } from './components/adminUi'
+import { Card, SectionLabel, INDIGO, INDIGO_2, INDIGO_RAMP, AMBER, chartAnim, areaGradient, glowPlugin, centerTextPlugin, chartTheme } from './components/adminUi'
 
 interface Summary {
   totalEvents: number
@@ -71,38 +71,39 @@ export default function AdminOverviewPage() {
     actChart.current?.destroy()
     langChart.current?.destroy()
 
-    const style = getComputedStyle(document.documentElement)
-    const grd = style.getPropertyValue('--adm-grid').trim() || 'rgba(255,255,255,.07)'
-    const txt = style.getPropertyValue('--adm-tick').trim() || '#8b85a6'
+    const theme = chartTheme()
     const scale = {
-      grid: { color: grd },
+      grid: { color: theme.gridColor },
       border: { display: false as const },
-      ticks: { color: txt, font: { family: 'monospace', size: 10 } },
+      ticks: { color: theme.textColor, font: { family: 'monospace', size: 10 } },
     }
+
+    const hourLabels = Array.from({ length: 24 }, (_, i) => `${i}h`)
 
     actChart.current = new Chart(actRef.current.getContext('2d')!, {
       type: 'line',
       data: {
-        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Hoy'],
+        labels: hourLabels,
         datasets: [
           {
-            data: analytics.summary.byHour.slice(0, 7),
-            borderColor: '#6366f1',
-            backgroundColor: 'rgba(99,102,241,0.14)',
-            fill: true,
+            data: analytics.summary.byHour,
+            backgroundColor: areaGradient(actRef.current.getContext('2d')!, actRef.current.height || 160, INDIGO),
+            borderColor: INDIGO_2,
+            borderWidth: 2,
             tension: 0.4,
-            pointRadius: 3,
-            pointBackgroundColor: '#6366f1',
-            borderWidth: 1.5,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            pointBackgroundColor: AMBER,
+            fill: true,
           },
         ],
       },
       options: {
-        animation: false,
+        animation: chartAnim(),
         plugins: { legend: { display: false } },
         scales: { x: scale, y: scale },
       },
-    })
+    }, [glowPlugin])
 
     langChart.current = new Chart(langRef.current.getContext('2d')!, {
       type: 'doughnut',
@@ -111,20 +112,21 @@ export default function AdminOverviewPage() {
         datasets: [
           {
             data: [58, 30, 12],
-            backgroundColor: ['#6366f1', '#a5a8f5', '#3b3a6b'],
+            backgroundColor: INDIGO_RAMP.slice(0, 3),
             borderWidth: 0,
+            hoverOffset: 6,
           },
         ],
       },
       options: {
-        animation: false,
-        cutout: '65%',
+        animation: { ...chartAnim(), animateRotate: true },
+        cutout: '70%',
         plugins: {
           legend: {
             display: true,
             position: 'bottom',
             labels: {
-              color: txt,
+              color: theme.textColor,
               font: { family: 'monospace', size: 10 },
               boxWidth: 10,
               padding: 8,
@@ -132,45 +134,46 @@ export default function AdminOverviewPage() {
           },
         },
       },
-    })
+    }, [centerTextPlugin('100%', 'ALUMNOS')])
 
     const handleThemeChange = () => {
       if (!analytics || !actRef.current || !langRef.current) return
-      const newStyle = getComputedStyle(document.documentElement)
-      const newGrd = newStyle.getPropertyValue('--adm-grid').trim() || 'rgba(255,255,255,.07)'
-      const newTxt = newStyle.getPropertyValue('--adm-tick').trim() || '#8b85a6'
+      const newTheme = chartTheme()
       const newScale = {
-        grid: { color: newGrd },
+        grid: { color: newTheme.gridColor },
         border: { display: false as const },
-        ticks: { color: newTxt, font: { family: 'monospace', size: 10 } },
+        ticks: { color: newTheme.textColor, font: { family: 'monospace', size: 10 } },
       }
 
       actChart.current?.destroy()
       langChart.current?.destroy()
 
+      const hourLabels = Array.from({ length: 24 }, (_, i) => `${i}h`)
+
       actChart.current = new Chart(actRef.current.getContext('2d')!, {
         type: 'line',
         data: {
-          labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Hoy'],
+          labels: hourLabels,
           datasets: [
             {
-              data: analytics.summary.byHour.slice(0, 7),
-              borderColor: '#6366f1',
-              backgroundColor: 'rgba(99,102,241,0.14)',
-              fill: true,
+              data: analytics.summary.byHour,
+              backgroundColor: areaGradient(actRef.current.getContext('2d')!, actRef.current.height || 160, INDIGO),
+              borderColor: INDIGO_2,
+              borderWidth: 2,
               tension: 0.4,
-              pointRadius: 3,
-              pointBackgroundColor: '#6366f1',
-              borderWidth: 1.5,
+              pointRadius: 0,
+              pointHoverRadius: 4,
+              pointBackgroundColor: AMBER,
+              fill: true,
             },
           ],
         },
         options: {
-          animation: false,
+          animation: chartAnim(),
           plugins: { legend: { display: false } },
           scales: { x: newScale, y: newScale },
         },
-      })
+      }, [glowPlugin])
 
       langChart.current = new Chart(langRef.current.getContext('2d')!, {
         type: 'doughnut',
@@ -179,20 +182,21 @@ export default function AdminOverviewPage() {
           datasets: [
             {
               data: [58, 30, 12],
-              backgroundColor: ['#6366f1', '#a5a8f5', '#3b3a6b'],
+              backgroundColor: INDIGO_RAMP.slice(0, 3),
               borderWidth: 0,
+              hoverOffset: 6,
             },
           ],
         },
         options: {
-          animation: false,
-          cutout: '65%',
+          animation: { ...chartAnim(), animateRotate: true },
+          cutout: '70%',
           plugins: {
             legend: {
               display: true,
               position: 'bottom',
               labels: {
-                color: newTxt,
+                color: newTheme.textColor,
                 font: { family: 'monospace', size: 10 },
                 boxWidth: 10,
                 padding: 8,
@@ -200,7 +204,7 @@ export default function AdminOverviewPage() {
             },
           },
         },
-      })
+      }, [centerTextPlugin('100%', 'ALUMNOS')])
     }
 
     window.addEventListener('adm-theme-change', handleThemeChange)
@@ -280,7 +284,7 @@ export default function AdminOverviewPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 8, marginBottom: '1rem' }}>
         <Card>
           <div style={{ padding: '0.75rem 1rem', borderBottom: '0.5px solid var(--adm-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--adm-text)' }}>Actividad últimos 7 días</span>
+            <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--adm-text)' }}>Actividad · últimas 24 h</span>
             <span style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-label)' }}>eventos</span>
           </div>
           <div style={{ padding: '0.75rem' }}>

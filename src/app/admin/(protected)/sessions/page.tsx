@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Chart from 'chart.js/auto'
-import { chartTheme } from '../components/adminUi'
+import { chartTheme, INDIGO, chartAnim } from '../components/adminUi'
 
 interface SessionRow {
   sessionId: string
@@ -157,14 +157,14 @@ export default function SessionsPage() {
         datasets: [
           {
             data: counts,
-            backgroundColor: '#10b981',
-            borderRadius: 2,
+            backgroundColor: INDIGO,
+            borderRadius: 4,
             borderWidth: 0,
           },
         ],
       },
       options: {
-        animation: false,
+        animation: chartAnim(),
         plugins: { legend: { display: false } },
         scales: { x: scale, y: scale },
       },
@@ -207,14 +207,14 @@ export default function SessionsPage() {
             datasets: [
               {
                 data: counts,
-                backgroundColor: '#10b981',
-                borderRadius: 2,
+                backgroundColor: INDIGO,
+                borderRadius: 4,
                 borderWidth: 0,
               },
             ],
           },
           options: {
-            animation: false,
+            animation: chartAnim(),
             plugins: { legend: { display: false } },
             scales: { x: scale, y: scale },
           },

@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Chart from 'chart.js/auto'
-import { chartTheme } from '../components/adminUi'
+import { chartTheme, INDIGO, INDIGO_RAMP, chartAnim, centerTextPlugin } from '../components/adminUi'
 
 interface CountryData {
   country: string
@@ -61,22 +61,21 @@ export default function GeoPage() {
       type: 'bar',
       data: {
         labels: topCountries.map((c) => `${c.flag} ${c.name}`),
-        datasets: [{ data: topCountries.map((c) => c.count), backgroundColor: '#10b981', borderRadius: 2, borderWidth: 0 }],
+        datasets: [{ data: topCountries.map((c) => c.count), backgroundColor: INDIGO, borderRadius: 4, borderWidth: 0 }],
       },
-      options: { animation: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
+      options: { animation: chartAnim(), indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
     })
 
     // Cities doughnut chart (top 8)
     const topCities = data.cities.slice(0, 8)
-    const colors = ['#10b981', '#6366F1', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#06b6d4', '#14b8a6']
     citiesChart.current = new Chart(citiesChartRef.current.getContext('2d')!, {
       type: 'doughnut',
       data: {
         labels: topCities.map((c) => `${c.flag} ${c.city}`),
-        datasets: [{ data: topCities.map((c) => c.count), backgroundColor: colors.slice(0, topCities.length), borderWidth: 0 }],
+        datasets: [{ data: topCities.map((c) => c.count), backgroundColor: INDIGO_RAMP.concat(INDIGO_RAMP).slice(0, topCities.length), borderWidth: 0, hoverOffset: 6 }],
       },
-      options: { animation: false, plugins: { legend: { position: 'right' as const } } },
-    })
+      options: { animation: { ...chartAnim(), animateRotate: true }, cutout: '68%', plugins: { legend: { position: 'right' as const } } },
+    }, [centerTextPlugin(String(totalCities), 'CIUDADES')])
 
     return () => { countriesChart.current?.destroy(); citiesChart.current?.destroy() }
   }, [data])
@@ -99,23 +98,22 @@ export default function GeoPage() {
             type: 'bar',
             data: {
               labels: topCountries.map((c) => `${c.flag} ${c.name}`),
-              datasets: [{ data: topCountries.map((c) => c.count), backgroundColor: '#10b981', borderRadius: 2, borderWidth: 0 }],
+              datasets: [{ data: topCountries.map((c) => c.count), backgroundColor: INDIGO, borderRadius: 4, borderWidth: 0 }],
             },
-            options: { animation: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
+            options: { animation: chartAnim(), indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
           })
         }
 
         if (citiesChartRef.current) {
           const topCities = data.cities.slice(0, 8)
-          const colors = ['#10b981', '#6366F1', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#06b6d4', '#14b8a6']
           citiesChart.current = new Chart(citiesChartRef.current.getContext('2d')!, {
             type: 'doughnut',
             data: {
               labels: topCities.map((c) => `${c.flag} ${c.city}`),
-              datasets: [{ data: topCities.map((c) => c.count), backgroundColor: colors.slice(0, topCities.length), borderWidth: 0 }],
+              datasets: [{ data: topCities.map((c) => c.count), backgroundColor: INDIGO_RAMP.concat(INDIGO_RAMP).slice(0, topCities.length), borderWidth: 0, hoverOffset: 6 }],
             },
-            options: { animation: false, plugins: { legend: { position: 'right' as const } } },
-          })
+            options: { animation: { ...chartAnim(), animateRotate: true }, cutout: '68%', plugins: { legend: { position: 'right' as const } } },
+          }, [centerTextPlugin(String(totalCities), 'CIUDADES')])
         }
       }
     }

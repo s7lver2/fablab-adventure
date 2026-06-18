@@ -37,7 +37,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             role={user.role}
             pendingAppeals={pendingAppeals}
           />
-          <main style={{ flex: 1, overflow: 'auto', background: 'var(--color-background-primary)' }}>
+          <main style={{ flex: 1, overflow: 'auto', background: 'var(--adm-bg-primary)' }}>
             {children}
           </main>
         </div>

@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Chart from 'chart.js/auto'
-import { chartTheme } from '../components/adminUi'
+import { chartTheme, INDIGO, INDIGO_RAMP, chartAnim } from '../components/adminUi'
 
 interface Summary { totalEvents: number; sessions: number; activeUsers: number; bounceSessions: number; avgSessionMs: number; byHour: number[] }
 interface StuckRow { challengeId: number; challengeTitle: string; current: number }
@@ -43,18 +43,18 @@ export default function AnalyticsPage() {
       type: 'bar',
       data: {
         labels: Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0')),
-        datasets: [{ data: data.summary.byHour, backgroundColor: '#10b981', borderRadius: 2, borderWidth: 0 }],
+        datasets: [{ data: data.summary.byHour, backgroundColor: INDIGO, borderRadius: 4, borderWidth: 0 }],
       },
-      options: { animation: false, plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
+      options: { animation: chartAnim(), plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
     })
 
     conceptsChart.current = new Chart(conceptsRef.current.getContext('2d')!, {
       type: 'bar',
       data: {
         labels: ['Fundamentos', 'Condicionales', 'Bucles', 'Funciones'],
-        datasets: [{ data: [5, 4, 4, 3], backgroundColor: ['#10b981', '#6366F1', '#f59e0b', '#ef4444'], borderRadius: 3, borderWidth: 0 }],
+        datasets: [{ data: [5, 4, 4, 3], backgroundColor: INDIGO_RAMP.slice(0, 4), borderRadius: 4, borderWidth: 0 }],
       },
-      options: { animation: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
+      options: { animation: chartAnim(), indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
     })
 
     return () => { hourlyChart.current?.destroy(); conceptsChart.current?.destroy() }
@@ -77,9 +77,9 @@ export default function AnalyticsPage() {
             type: 'bar',
             data: {
               labels: Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0')),
-              datasets: [{ data: data.summary.byHour, backgroundColor: '#10b981', borderRadius: 2, borderWidth: 0 }],
+              datasets: [{ data: data.summary.byHour, backgroundColor: INDIGO, borderRadius: 4, borderWidth: 0 }],
             },
-            options: { animation: false, plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
+            options: { animation: chartAnim(), plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
           })
         }
 
@@ -88,9 +88,9 @@ export default function AnalyticsPage() {
             type: 'bar',
             data: {
               labels: ['Fundamentos', 'Condicionales', 'Bucles', 'Funciones'],
-              datasets: [{ data: [5, 4, 4, 3], backgroundColor: ['#10b981', '#6366F1', '#f59e0b', '#ef4444'], borderRadius: 3, borderWidth: 0 }],
+              datasets: [{ data: [5, 4, 4, 3], backgroundColor: INDIGO_RAMP.slice(0, 4), borderRadius: 4, borderWidth: 0 }],
             },
-            options: { animation: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
+            options: { animation: chartAnim(), indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
           })
         }
       }
