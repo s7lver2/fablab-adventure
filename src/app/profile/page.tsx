@@ -13,7 +13,7 @@ export default async function ProfilePage() {
   const profile = buildProfile(db, user)
 
   return (
-    <main className="page">
+    <main className="page page--wide">
       <AppBar avatar={user.avatar} displayName={user.displayName} />
       <ProfileView profile={profile} />
     </main>

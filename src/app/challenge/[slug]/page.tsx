@@ -21,11 +21,19 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
   const [consoleOut, setConsoleOut] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [score, setScore] = useState<{ correct: boolean; stars: number } | null>(null)
+  const [nextSlug, setNextSlug] = useState<string | null>(null)
   const [hintsUsed, setHintsUsed] = useState(0)
   const [hintText, setHintText] = useState('')
   const [running, setRunning] = useState(false)
 
   useEffect(() => {
+    setData(null)
+    setConsoleOut('')
+    setSubmitted(false)
+    setScore(null)
+    setNextSlug(null)
+    setHintsUsed(0)
+    setHintText('')
     fetch(`/api/challenges/${slug}`)
       .then((r) => r.json())
       .then((d: ChallengeData) => {
@@ -61,6 +69,7 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
     })
     const json = await res.json()
     setScore({ correct: json.correct, stars: json.stars })
+    setNextSlug(json.next ?? null)
     setSubmitted(true)
     setRunning(false)
   }
@@ -180,6 +189,20 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
                 {running ? 'Comprobando…' : '🚀 Enviar solución'}
               </button>
             </div>
+
+            {submitted && score?.correct && (
+              <div className="panel__actions" style={{ marginTop: '0.75rem' }}>
+                {nextSlug ? (
+                  <Link href={`/challenge/${nextSlug}`} className="btn" style={{ flex: 1, textAlign: 'center' }}>
+                    Siguiente →
+                  </Link>
+                ) : (
+                  <Link href="/dashboard" className="btn" style={{ flex: 1, textAlign: 'center' }}>
+                    🎉 ¡Curso completado! Volver al inicio
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
