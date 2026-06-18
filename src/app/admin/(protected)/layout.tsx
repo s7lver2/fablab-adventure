@@ -5,6 +5,7 @@ import { AppealRepository } from '@/lib/appeals/repository'
 import { getCurrentUser } from '@/lib/session/server'
 import { isAdmin } from '@/lib/auth/guard'
 import { AdminSidebar } from './components/AdminSidebar'
+import { AdminShellWrapper } from './components/AdminShellWrapper'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const db = getDb()
@@ -14,15 +15,17 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const pendingAppeals = new AppealRepository(db).listPending().length
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
-      <AdminSidebar
-        username={user.username}
-        role={user.role}
-        pendingAppeals={pendingAppeals}
-      />
-      <main style={{ flex: 1, overflow: 'auto', background: 'var(--color-background-primary)' }}>
-        {children}
-      </main>
-    </div>
+    <AdminShellWrapper>
+      <div style={{ display: 'flex', minHeight: '100vh' }}>
+        <AdminSidebar
+          username={user.username}
+          role={user.role}
+          pendingAppeals={pendingAppeals}
+        />
+        <main style={{ flex: 1, overflow: 'auto', background: 'var(--color-background-primary)' }}>
+          {children}
+        </main>
+      </div>
+    </AdminShellWrapper>
   )
 }
