@@ -1,153 +1,123 @@
 'use client'
 import { useEffect, useState } from 'react'
 
-interface UserView {
-  id: number
-  username: string
-  displayName: string
-  role: 'user' | 'admin' | 'root'
+interface UserRow { id: number; username: string; displayName: string; role: string; createdAt: number }
+
+const TH: React.CSSProperties = { padding: '0.5rem 1rem', fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', textAlign: 'left', letterSpacing: '0.06em', borderBottom: '0.5px solid var(--color-border-tertiary)' }
+const TD: React.CSSProperties = { padding: '0.5rem 1rem', fontSize: 12, borderBottom: '0.5px solid var(--color-border-tertiary)' }
+
+function roleBadge(role: string) {
+  const color = role === 'root' ? 'var(--color-text-warning)' : role === 'admin' ? 'var(--color-text-info)' : 'var(--color-text-secondary)'
+  const bg = role === 'root' ? 'var(--color-background-warning)' : role === 'admin' ? 'var(--color-background-info)' : 'var(--color-background-secondary)'
+  return (
+    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color, background: bg, padding: '2px 6px', borderRadius: 99 }}>
+      {role}
+    </span>
+  )
 }
 
-export default function AdminUsersPage() {
-  const [users, setUsers] = useState<UserView[]>([])
-  const [newUsername, setNewUsername] = useState('')
-  const [newDisplayName, setNewDisplayName] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [msg, setMsg] = useState('')
-  const [selectedUser, setSelectedUser] = useState<number | null>(null)
-  const [selectedRole, setSelectedRole] = useState<'user' | 'admin'>('user')
+export default function UsersPage() {
+  const [users, setUsers] = useState<UserRow[]>([])
+  const [showForm, setShowForm] = useState(false)
+  const [form, setForm] = useState({ username: '', displayName: '', password: '' })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    fetch('/api/admin/users').then((r) => r.json()).then(setUsers)
-  }, [])
+  const reload = () => fetch('/api/admin/users').then((r) => r.json()).then(setUsers)
+  useEffect(() => { reload() }, [])
 
-  async function createAdmin(e: React.FormEvent) {
+  async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
-    setMsg('')
-    const res = await fetch('/api/admin/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: newUsername,
-        displayName: newDisplayName,
-        password: newPassword,
-      }),
-    })
-    const data = await res.json()
-    if (!res.ok) {
-      setMsg(`Error: ${data.error}`)
-      return
-    }
-    setMsg('Administrador creado.')
-    setNewUsername('')
-    setNewDisplayName('')
-    setNewPassword('')
-    setUsers([...users, data.user])
+    setLoading(true); setError('')
+    const res = await fetch('/api/admin/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
+    const json = await res.json()
+    setLoading(false)
+    if (!res.ok) { setError(json.error ?? 'Error'); return }
+    setForm({ username: '', displayName: '', password: '' }); setShowForm(false); reload()
   }
 
-  async function changeRole(userId: number, newRole: 'user' | 'admin') {
-    const res = await fetch('/api/admin/users', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, role: newRole }),
-    })
-    if (res.ok) {
-      setUsers(users.map((u) => (u.id === userId ? { ...u, role: newRole } : u)))
-      setSelectedUser(null)
-      setMsg('Rol actualizado.')
-    } else {
-      const data = await res.json()
-      setMsg(`Error: ${data.error}`)
-    }
+  async function changeRole(userId: number, role: string) {
+    await fetch('/api/admin/users', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId, role }) })
+    reload()
   }
+
+  const input: React.CSSProperties = { background: 'var(--color-background-secondary)', border: '0.5px solid var(--color-border-tertiary)', borderRadius: 'var(--border-radius-md)', padding: '0.4rem 0.6rem', fontSize: 12, color: 'var(--color-text-primary)', fontFamily: 'var(--font-mono)', outline: 'none', width: '100%' }
 
   return (
-    <main style={{ maxWidth: 900, margin: '2rem auto', fontFamily: 'system-ui' }}>
-      <h1>Gestión de usuarios</h1>
+    <div style={{ padding: '1.25rem' }}>
+      <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>gestión</div>
+          <div style={{ fontSize: 17, fontWeight: 500, color: 'var(--color-text-primary)' }}>Alumnos y admins</div>
+        </div>
+        <button onClick={() => setShowForm(!showForm)} style={{ background: 'var(--color-background-success)', color: 'var(--color-text-success)', border: 'none', borderRadius: 'var(--border-radius-md)', padding: '0.4rem 0.875rem', fontSize: 12, fontFamily: 'var(--font-mono)', cursor: 'pointer' }}>
+          + nuevo admin
+        </button>
+      </div>
 
-      <section>
-        <h2>Crear administrador</h2>
-        <form onSubmit={createAdmin} style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 400 }}>
-          <input
-            value={newUsername}
-            onChange={(e) => setNewUsername(e.target.value)}
-            placeholder="Usuario"
-            required
-          />
-          <input
-            value={newDisplayName}
-            onChange={(e) => setNewDisplayName(e.target.value)}
-            placeholder="Nombre mostrado"
-          />
-          <input
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            placeholder="Contraseña"
-            type="password"
-            required
-          />
-          <button type="submit">Crear</button>
-        </form>
-      </section>
+      {showForm && (
+        <div style={{ border: '0.5px solid var(--color-border-tertiary)', borderRadius: 'var(--border-radius-lg)', padding: '1rem', marginBottom: '1rem' }}>
+          <div style={{ fontSize: 13, fontWeight: 500, marginBottom: '0.75rem', color: 'var(--color-text-primary)' }}>Crear admin</div>
+          <form onSubmit={handleCreate} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: 8, alignItems: 'end' }}>
+            <div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', marginBottom: 4 }}>USUARIO</div>
+              <input style={input} value={form.username} onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))} placeholder="admin2" required />
+            </div>
+            <div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', marginBottom: 4 }}>NOMBRE</div>
+              <input style={input} value={form.displayName} onChange={(e) => setForm((f) => ({ ...f, displayName: e.target.value }))} placeholder="Nombre Admin" />
+            </div>
+            <div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', marginBottom: 4 }}>CONTRASEÑA</div>
+              <input style={input} type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} required />
+            </div>
+            <button type="submit" disabled={loading} style={{ background: 'var(--color-background-success)', color: 'var(--color-text-success)', border: 'none', borderRadius: 'var(--border-radius-md)', padding: '0.4rem 0.875rem', fontSize: 12, fontFamily: 'var(--font-mono)', cursor: 'pointer' }}>
+              {loading ? '…' : 'Crear'}
+            </button>
+          </form>
+          {error && <div style={{ marginTop: 8, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-danger)' }}>{error}</div>}
+        </div>
+      )}
 
-      <section style={{ marginTop: '2rem' }}>
-        <h2>Usuarios</h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid #ccc' }}>
-              <th style={{ textAlign: 'left', padding: 8 }}>Usuario</th>
-              <th style={{ textAlign: 'left', padding: 8 }}>Nombre</th>
-              <th style={{ textAlign: 'left', padding: 8 }}>Rol</th>
-              <th style={{ textAlign: 'left', padding: 8 }}>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.id} style={{ borderBottom: '1px solid #eee' }}>
-                <td style={{ padding: 8 }}>{u.username}</td>
-                <td style={{ padding: 8 }}>{u.displayName}</td>
-                <td style={{ padding: 8 }}>{u.role === 'root' ? '⭐ root' : u.role}</td>
-                <td style={{ padding: 8 }}>
-                  {u.role !== 'root' && (
-                    <>
-                      {selectedUser === u.id ? (
-                        <div style={{ display: 'flex', gap: 4 }}>
-                          <select
-                            value={selectedRole}
-                            onChange={(e) => setSelectedRole(e.target.value as any)}
-                            style={{ padding: 4 }}
-                          >
-                            <option value="user">user</option>
-                            <option value="admin">admin</option>
-                          </select>
-                          <button onClick={() => changeRole(u.id, selectedRole)} style={{ padding: '4px 8px' }}>
-                            Aplicar
-                          </button>
-                          <button onClick={() => setSelectedUser(null)} style={{ padding: '4px 8px' }}>
-                            Cancelar
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => {
-                            setSelectedUser(u.id)
-                            setSelectedRole(u.role === 'user' ? 'admin' : 'user')
-                          }}
-                          style={{ padding: '4px 8px' }}
-                        >
-                          Cambiar rol
-                        </button>
-                      )}
-                    </>
-                  )}
-                </td>
+      <div style={{ border: '0.5px solid var(--color-border-tertiary)', borderRadius: 'var(--border-radius-lg)', overflow: 'hidden' }}>
+        <div style={{ padding: '0.75rem 1rem', borderBottom: '0.5px solid var(--color-border-tertiary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)' }}>Usuarios</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)' }}>{users.length} total</span>
+        </div>
+        {users.length === 0 && <div style={{ padding: '0.75rem 1rem', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-secondary)' }}>Sin usuarios</div>}
+        {users.length > 0 && (
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                {['USUARIO', 'NOMBRE', 'ROL', 'CAMBIAR ROL'].map((h) => (
+                  <th key={h} style={TH}>{h}</th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
-
-      {msg && <p style={{ marginTop: '1rem', color: msg.includes('Error') ? 'crimson' : 'green' }}>{msg}</p>}
-    </main>
+            </thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.id}>
+                  <td style={{ ...TD, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-primary)' }}>{u.username}</td>
+                  <td style={{ ...TD, color: 'var(--color-text-secondary)' }}>{u.displayName || '—'}</td>
+                  <td style={TD}>{roleBadge(u.role)}</td>
+                  <td style={TD}>
+                    {u.role !== 'root' && (
+                      <select
+                        value={u.role}
+                        onChange={(e) => changeRole(u.id, e.target.value)}
+                        style={{ background: 'var(--color-background-secondary)', border: '0.5px solid var(--color-border-tertiary)', borderRadius: 'var(--border-radius-md)', padding: '2px 6px', fontSize: 11, color: 'var(--color-text-primary)', fontFamily: 'var(--font-mono)', cursor: 'pointer' }}
+                      >
+                        <option value="user">user</option>
+                        <option value="admin">admin</option>
+                      </select>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
   )
 }

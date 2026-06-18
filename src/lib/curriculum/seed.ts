@@ -10,6 +10,8 @@ export function seedCurriculum(db: Database.Database): void {
 
   db.prepare('DELETE FROM challenge_variants').run()
   db.prepare('DELETE FROM test_cases').run()
+  db.prepare('DELETE FROM progress').run()
+  db.prepare('DELETE FROM review_requests').run()
   db.prepare('DELETE FROM challenges').run()
   db.prepare('DELETE FROM concepts').run()
 
