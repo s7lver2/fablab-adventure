@@ -5,7 +5,7 @@ import { StarRating } from '@/components/StarRating'
 export interface RecentLesson {
   id: string
   title: string
-  completedAt: number // Unix timestamp in ms
+  completedAt: number
   stars: number
 }
 
@@ -26,16 +26,16 @@ function timeAgo(timestamp: number): string {
 export function RecentLessons({ lessons }: { lessons: RecentLesson[] }) {
   if (lessons.length === 0) {
     return (
-      <div className="pf-section">
-        <h2>Lecciones recientes</h2>
+      <div className="pf-card">
+        <h2 className="pf-section-title">Lecciones recientes</h2>
         <p className="pf-empty">No hay lecciones completadas aún.</p>
       </div>
     )
   }
 
   return (
-    <div className="pf-section">
-      <h2>Lecciones recientes</h2>
+    <div className="pf-card">
+      <h2 className="pf-section-title">Lecciones recientes</h2>
       <ul className="pf-lessons">
         {lessons.map((lesson) => (
           <li key={lesson.id} className="pf-lesson">

@@ -90,6 +90,15 @@ export function ProfileView({ profile }: { profile: PublicProfile }) {
 
   const local: PublicProfile = { ...profile, displayName, avatar, avatarImage, profileMessage, banner, bannerImage }
 
+  const masteryObj = Object.fromEntries(profile.mastery.map((m) => [m.concept, m.pct]))
+
+  const recentLessonsFormatted = profile.recentLessons.map((lesson) => ({
+    id: lesson.slug,
+    title: lesson.title,
+    completedAt: lesson.completedAt,
+    stars: lesson.stars,
+  }))
+
   if (editing) {
     return (
       <div className="pf-wrap">
@@ -244,6 +253,11 @@ export function ProfileView({ profile }: { profile: PublicProfile }) {
     <>
       <ProfileLayout
         profile={local}
+        totalStars={profile.totalStars}
+        challengesDone={profile.challengesDone}
+        mastery={masteryObj}
+        recentLessons={recentLessonsFormatted}
+        badges={profile.badges.map((b) => ({ ...b, title: b.label }))}
         action={
           <button
             type="button"

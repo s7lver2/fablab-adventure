@@ -52,7 +52,7 @@ export function ProfileLayout({
         <div className="pf-grid2">
           {hasMastery && (
             <div className="pf-card">
-              <h2 className="pf-section-title">Dominio</h2>
+              <h2 className="pf-section-title">Hexagons por concepto</h2>
               <Hexagon mastery={mastery} />
             </div>
           )}
