@@ -992,11 +992,20 @@ textarea {
   text-align: center;
 }
 
+.pf-panel:nth-child(2) {
+  border-color: var(--amber);
+  box-shadow: 0 5px 0 var(--amber-dark);
+}
+
 .pf-panel-value {
   font-size: 2rem;
   font-weight: 900;
   color: var(--green-dark);
   line-height: 1;
+}
+
+.pf-panel:nth-child(2) .pf-panel-value {
+  color: var(--amber-dark);
 }
 
 .pf-panel-label {
@@ -1024,6 +1033,16 @@ textarea {
   grid-template-columns: 1fr 1fr;
   gap: 1.25rem;
   margin-bottom: 1.25rem;
+}
+
+.pf-grid2 > .pf-card:nth-child(1) {
+  border-color: var(--violet);
+  box-shadow: 0 5px 0 var(--violet-dark);
+}
+
+.pf-grid2 > .pf-card:nth-child(2) {
+  border-color: var(--amber);
+  box-shadow: 0 5px 0 var(--amber-dark);
 }
 
 @media (max-width: 700px) {
