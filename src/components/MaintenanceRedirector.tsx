@@ -10,6 +10,8 @@ export function MaintenanceRedirector() {
 
   useEffect(() => {
     // Verificar estado de mantenimiento
+    // La landing page (/) nunca debe ser bloqueada por mantenimiento
+    if (pathname === '/') return
     ;(async () => {
       try {
         const res = await fetch('/api/maintenance/status')

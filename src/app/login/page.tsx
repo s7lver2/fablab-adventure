@@ -20,7 +20,7 @@ export default function LoginPage() {
       setError(data.error ?? 'No se pudo entrar.')
       return
     }
-    router.push('/')
+    router.push('/dashboard')
   }
 
   return (

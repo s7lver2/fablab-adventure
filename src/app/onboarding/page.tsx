@@ -23,7 +23,7 @@ export default function OnboardingPage() {
         body: JSON.stringify({ language: lang }),
       })
       if (!res.ok) throw new Error('Error al guardar')
-      router.push('/')
+      router.push('/dashboard')
     } catch {
       setError('Algo salió mal. Inténtalo de nuevo.')
       setLoading(false)
