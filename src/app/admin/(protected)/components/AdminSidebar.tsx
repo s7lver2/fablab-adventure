@@ -9,7 +9,14 @@ interface Props {
   pendingAppeals: number
 }
 
-const NAV_GROUPS = [
+interface NavItem {
+  href: string
+  label: string
+  icon: string
+  italic?: boolean
+}
+
+const NAV_GROUPS: NavItem[][] = [
   [
     { href: '/admin', label: 'Resumen', icon: '▦' },
     { href: '/admin/live', label: 'En vivo', icon: '◉' },
@@ -25,6 +32,7 @@ const NAV_GROUPS = [
     { href: '/admin/audit', label: 'Auditoría', icon: '◫' },
     { href: '/admin/settings', label: 'Ajustes', icon: '⚙' },
     { href: '/admin/geo', label: 'Geografía', icon: '🌍' },
+    { href: '/admin/api', label: 'api', icon: '⟨⟩', italic: true },
   ],
 ]
 
@@ -74,7 +82,7 @@ export function AdminSidebar({ username, role, pendingAppeals }: Props) {
                 }}
               >
                 <span style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 13 }}>{item.icon}</span>
-                {item.label}
+                <span style={{ fontStyle: item.italic ? 'italic' : 'normal' }}>{item.label}</span>
                 {item.href === '/admin/appeals' && pendingAppeals > 0 && (
                   <span style={{
                     marginLeft: 'auto', fontFamily: 'var(--adm-font-mono)', fontSize: 10,
