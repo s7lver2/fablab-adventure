@@ -7,7 +7,8 @@ import { runJs } from '../engine/js-runner'
 
 // slug -> solución JS de referencia. Se amplía en tareas posteriores.
 const SOLUTIONS: Record<string, string> = {
-  saludo: 'print("Hola mundo")',
+  'primera-cuenta': 'print(2 + 3)',
+  'imprimir-numeros': 'print(7)',
   'mi-nombre': 'let nombre = "Mundo"\nprint("Hola, " + nombre)',
   suma: 'print(input.a + input.b)',
   doble: 'print(input.n * 2)',
@@ -21,8 +22,11 @@ const SOLUTIONS: Record<string, string> = {
   invertir: 'for (let i = input.items.length - 1; i >= 0; i--) {\n  print(input.items[i])\n}',
   'contar-pares': 'for (let i = 0; i < input.items.length; i++) {\n  if (input.items[i] % 2 === 0) {\n    print(input.items[i])\n  }\n}',
   'funcion-saludo': 'function saludar(nombre) {\n  return "Hola, " + nombre + "!"\n}\nprint(saludar(input.nombre))',
+  operaciones: 'print(10 - 4)\nprint(3 * 5)',
   potencia: 'function potencia(base, exp) {\n  let r = 1\n  for (let i = 0; i < exp; i++) { r = r * base }\n  return r\n}\nprint(potencia(input.base, input.exp))',
   'es-primo': 'function esPrimo(n) {\n  if (n < 2) return false\n  for (let i = 2; i * i <= n; i++) {\n    if (n % i === 0) return false\n  }\n  return true\n}\nprint(esPrimo(input.n) ? "primo" : "no primo")',
+  saludo: 'print("Hola mundo")',
+  'varias-lineas': 'print("Hola")\nprint("me llamo Robot")\nprint("adiós")',
 }
 
 function seededRepo() {
