@@ -9,6 +9,9 @@ import { runJs } from '../engine/js-runner'
 const SOLUTIONS: Record<string, string> = {
   'primera-cuenta': 'print(2 + 3)',
   'imprimir-numeros': 'print(7)',
+  'guardar-numero': 'let edad = 10\nprint(edad)',
+  'caja-cuenta': 'let a = 5\nlet b = 3\nprint(a + b)',
+  'juntar-textos': 'let nombre = "Lia"\nprint("Hola, " + nombre + ". ¿Qué tal?")',
   'mi-nombre': 'let nombre = "Mundo"\nprint("Hola, " + nombre)',
   suma: 'print(input.a + input.b)',
   doble: 'print(input.n * 2)',

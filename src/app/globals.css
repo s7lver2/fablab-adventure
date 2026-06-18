@@ -666,6 +666,24 @@ textarea {
   border-color: transparent;
 }
 
+.console-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.console-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f9e2af;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.82rem;
+  padding: 0;
+  caret-color: #f9e2af;
+}
+
 .console-out {
   background: #1e1e2e;
   color: #a6e3a1;

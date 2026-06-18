@@ -1,12 +1,17 @@
-import type { RunResult } from './js-runner'
+import type { RunResult, RunIO } from './js-runner'
 
 type SkulptModule = {
-  configure: (opts: { output?: (text: string) => void; __future__?: unknown }) => void
+  configure: (opts: {
+    output?: (text: string) => void
+    __future__?: unknown
+    inputfun?: (prompt: string) => string
+    inputfunTakesPrompt?: boolean
+  }) => void
   importMainWithBody: (name: string, dumpJS: boolean, code: string, canSuspend: boolean) => void
   python3: unknown
 }
 
-export function runPython(code: string, input: unknown): RunResult {
+export function runPython(code: string, input: unknown, io: RunIO = {}): RunResult {
   const started = Date.now()
 
   try {
@@ -24,15 +29,23 @@ export function runPython(code: string, input: unknown): RunResult {
 
     Sk.configure({
       output: (text: string) => {
-        if (text !== '\n') lines.push(text.replace(/\n$/, ''))
+        if (text === '\n') return
+        const line = text.replace(/\n$/, '')
+        lines.push(line)
+        io.onOutput?.(line)
       },
       __future__: Sk.python3,
+      // input() lee de la consola interactiva. inputfun síncrona: en el worker
+      // bloquea con Atomics.wait hasta que el usuario escribe. El eco del prompt y
+      // del valor lo pinta la consola del hilo principal.
+      inputfun: (prompt: string): string => (io.onInput ? io.onInput(prompt ?? '') : ''),
+      inputfunTakesPrompt: true,
     })
 
-    const inputLiteral = input === null || input === undefined
-      ? 'None'
-      : JSON.stringify(input)
-    const injected = `input = ${inputLiteral}\n${code}`
+    // Inyecta los datos del reto como variable `input` solo cuando los hay; si no, deja
+    // libre el builtin input() para programas interactivos del alumno.
+    const hasData = input !== null && input !== undefined
+    const injected = hasData ? `input = ${JSON.stringify(input)}\n${code}` : code
     Sk.importMainWithBody('<alumno>', false, injected, false)
 
     return { output: lines.join('\n'), timeMs: Date.now() - started }
