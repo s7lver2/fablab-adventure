@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 import Chart from 'chart.js/auto'
 import { chartAnim, INDIGO_RAMP, chartTheme } from './adminUi'
 
-export function StackedArea({ labels, series }: { labels: string[]; series: { path: string; data: number[] }[] }) {
+export function StackedArea({ labels, series, height = 200 }: { labels: string[]; series: { path: string; data: number[] }[]; height?: number }) {
   const ref = useRef<HTMLCanvasElement>(null)
   const chart = useRef<Chart | null>(null)
   useEffect(() => {
@@ -36,7 +36,7 @@ export function StackedArea({ labels, series }: { labels: string[]; series: { pa
           </span>
         ))}
       </div>
-      <div style={{ position: 'relative', height: 200 }}><canvas ref={ref} role="img" aria-label="Tráfico por página apilado en el tiempo" /></div>
+      <div style={{ position: 'relative', height }}><canvas ref={ref} role="img" aria-label="Tráfico por página apilado en el tiempo" /></div>
     </>
   )
 }

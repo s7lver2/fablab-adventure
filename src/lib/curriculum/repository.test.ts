@@ -43,13 +43,14 @@ describe('CurriculumRepository.listConceptsWithChallenges', () => {
     seedCurriculum(db)
   })
 
-  it('retorna 4 conceptos', () => {
+  it('retorna 7 conceptos', () => {
     const concepts = new CurriculumRepository(db).listConceptsWithChallenges()
-    expect(concepts).toHaveLength(4)
+    expect(concepts).toHaveLength(7)
   })
 
-  it('el primer concepto tiene 5 retos', () => {
+  it('el primer concepto es Primeros pasos con 5 retos', () => {
     const [first] = new CurriculumRepository(db).listConceptsWithChallenges()
+    expect(first.slug).toBe('primeros-pasos')
     expect(first.challenges).toHaveLength(5)
   })
 

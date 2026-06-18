@@ -6,7 +6,10 @@ export class CurriculumRepository {
 
   listChallenges(): ChallengeSummary[] {
     return this.db
-      .prepare('SELECT id, slug, title, ord FROM challenges ORDER BY ord ASC, id ASC')
+      .prepare(`SELECT ch.id, ch.slug, ch.title, ch.ord
+                FROM challenges ch
+                JOIN concepts c ON c.id = ch.concept_id
+                ORDER BY c.ord ASC, ch.ord ASC, ch.id ASC`)
       .all() as ChallengeSummary[]
   }
 
@@ -94,9 +97,9 @@ export class CurriculumRepository {
 
     return concepts.map((c) => ({
       ...c,
-      challenges: this.db
-        .prepare('SELECT id, slug, title, ord FROM challenges WHERE concept_id = ? ORDER BY ord ASC, id ASC')
-        .all(c.id) as ChallengeSummary[],
+      challenges: (this.db
+        .prepare('SELECT id, slug, title, ord, group_name as groupName FROM challenges WHERE concept_id = ? ORDER BY ord ASC, id ASC')
+        .all(c.id) as ChallengeSummary[]),
     }))
   }
 }

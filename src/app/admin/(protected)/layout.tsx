@@ -1,3 +1,4 @@
+import Script from 'next/script'
 import { redirect } from 'next/navigation'
 import { getDb } from '@/lib/db/connection'
 import { UserRepository } from '@/lib/users/repository'
@@ -6,17 +7,6 @@ import { getCurrentUser } from '@/lib/session/server'
 import { isAdmin } from '@/lib/auth/guard'
 import { AdminSidebar } from './components/AdminSidebar'
 import { AdminShellWrapper } from './components/AdminShellWrapper'
-
-// No-flash inline script that runs before React hydration
-const NO_FLASH_SCRIPT = `
-  (function() {
-    const storedTheme = localStorage.getItem('adm-theme') || 'dark';
-    const shell = document.querySelector('.admin-shell');
-    if (shell) {
-      shell.setAttribute('data-theme', storedTheme);
-    }
-  })();
-`;
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const db = getDb()
@@ -27,17 +17,23 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <>
-      {/* No-flash script: applies theme from localStorage before React hydration */}
-      <script dangerouslySetInnerHTML={{ __html: NO_FLASH_SCRIPT }} />
+      {/* Applies theme from localStorage before React hydration to prevent flash */}
+      <Script id="adm-no-flash" strategy="beforeInteractive">{`
+        (function(){
+          var t=localStorage.getItem('adm-theme')||'dark';
+          var s=document.querySelector('.admin-shell');
+          if(s) s.setAttribute('data-theme',t);
+        })();
+      `}</Script>
 
       <AdminShellWrapper>
-        <div style={{ display: 'flex', minHeight: '100vh' }}>
+        <div style={{ display: 'flex', minHeight: '100vh', flex: 1, minWidth: 0, width: '100%' }}>
           <AdminSidebar
             username={user.username}
             role={user.role}
             pendingAppeals={pendingAppeals}
           />
-          <main style={{ flex: 1, overflow: 'auto', background: 'var(--adm-bg-primary)' }}>
+          <main style={{ flex: 1, minWidth: 0, overflow: 'auto', background: 'var(--adm-bg-primary)' }}>
             {children}
           </main>
         </div>

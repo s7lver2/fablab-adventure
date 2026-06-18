@@ -5,6 +5,7 @@ export interface ChallengeSummary {
   slug: string
   title: string
   ord: number
+  groupName?: string | null
 }
 
 export interface ChallengeVariant {

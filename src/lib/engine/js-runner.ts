@@ -4,6 +4,17 @@ export interface RunResult {
   timeMs: number
 }
 
+/**
+ * Puente de entrada/salida del programa con el exterior.
+ * - onOutput: se llama por cada línea impresa (para mostrarla en vivo en la consola).
+ * - onInput: lectura BLOQUEANTE de una línea escrita por el usuario. Devuelve el texto.
+ *   En el worker se implementa con SharedArrayBuffer + Atomics.wait.
+ */
+export interface RunIO {
+  onOutput?: (line: string) => void
+  onInput?: (prompt: string) => string
+}
+
 export function friendlyError(err: unknown): string {
   const raw = err instanceof Error ? err.message : String(err)
   if (/Unexpected end of input/i.test(raw)) {
@@ -47,20 +58,46 @@ function injectIterationGuard(code: string): string {
   return withGuard
 }
 
-export function runJs(code: string, input: unknown): RunResult {
+const MAX_OUTPUT_LINES = 10000
+
+export function runJs(code: string, input: unknown, io: RunIO = {}): RunResult {
   const started = Date.now()
   const lines: string[] = []
-  const print = (...args: unknown[]) => {
-    lines.push(args.map((a) => String(a)).join(' '))
+  const emit = (line: string) => {
+    if (lines.length >= MAX_OUTPUT_LINES) {
+      throw new Error('Demasiada salida (¿un bucle sin fin?). El programa se detuvo.')
+    }
+    lines.push(line)
+    io.onOutput?.(line)
   }
+  const print = (...args: unknown[]) => {
+    emit(args.map((a) => String(a)).join(' '))
+  }
+
+  // Entrada interactiva: leer()/leerNumero() esperan a que el usuario escriba en la consola.
+  // Si no hay onInput (p. ej. al calificar), devuelve cadena vacía sin bloquear.
+  const readLine = (prompt: string): string => (io.onInput ? io.onInput(prompt) : '')
+  const leer = (mensaje?: unknown): string =>
+    readLine(mensaje === undefined || mensaje === null ? '' : String(mensaje))
+  const leerNumero = (mensaje?: unknown): number => Number(leer(mensaje))
+  // preguntar(mensaje): igual que prompt() — muestra el mensaje y devuelve lo escrito.
+  const preguntar = (mensaje?: unknown): string => leer(mensaje)
+
   try {
     // Inject iteration guard to catch infinite loops early
     const guardedCode = injectIterationGuard(code)
     // eslint-disable-next-line no-new-func
-    const fn = new Function('input', 'print', `"use strict";\n${guardedCode}`)
-    fn(input, print)
+    const fn = new Function(
+      'input',
+      'print',
+      'leer',
+      'leerNumero',
+      'preguntar',
+      `"use strict";\n${guardedCode}`,
+    )
+    fn(input, print, leer, leerNumero, preguntar)
     return { output: lines.join('\n'), timeMs: Date.now() - started }
   } catch (err) {
-    return { output: '', error: friendlyError(err), timeMs: Date.now() - started }
+    return { output: lines.join('\n'), error: friendlyError(err), timeMs: Date.now() - started }
   }
 }

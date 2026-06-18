@@ -2,8 +2,37 @@ import { cookies } from 'next/headers'
 import { signSession, verifySession } from './cookie'
 import type { UserRepository } from '../users/repository'
 import type { User } from '../users/types'
+import type { Language } from '../curriculum/types'
 
 export const SESSION_COOKIE = 'fll_session'
+
+// El lenguaje elegido se guarda TAMBIÉN en una cookie. En Vercel (serverless) la DB
+// vive en /tmp y es distinta por instancia, así que el valor escrito en la DB no se
+// lee de forma fiable en la siguiente petición. La cookie viaja con cada request y es
+// consistente entre instancias: la usamos como fuente de verdad para el lenguaje.
+export const LANG_COOKIE = 'fll_lang'
+
+function isLanguage(v: unknown): v is Language {
+  return v === 'js' || v === 'python' || v === 'blocks'
+}
+
+/** Escribe el lenguaje elegido en una cookie legible en cualquier instancia. */
+export async function setLanguageCookie(lang: Language): Promise<void> {
+  const store = await cookies()
+  store.set(LANG_COOKIE, lang, { sameSite: 'lax', path: '/' })
+}
+
+export async function clearLanguageCookie(): Promise<void> {
+  const store = await cookies()
+  store.delete(LANG_COOKIE)
+}
+
+/** Lenguaje elegido: prioriza la cookie y cae al valor de la DB si no hay cookie. */
+export async function getChosenLanguage(dbFallback: Language | null): Promise<Language | null> {
+  const store = await cookies()
+  const value = store.get(LANG_COOKIE)?.value
+  return isLanguage(value) ? value : dbFallback
+}
 
 function getSecret(): string {
   return process.env.SESSION_SECRET ?? 'dev-insecure-secret-change-me'
