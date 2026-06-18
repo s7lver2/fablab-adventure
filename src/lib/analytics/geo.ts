@@ -16,8 +16,24 @@ const FLAGS: Record<string, string> = {
   '??': '🏳️',
 }
 
+const COUNTRY_NAMES: Record<string, string> = {
+  ES: 'España',
+  MX: 'México',
+  AR: 'Argentina',
+  PT: 'Portugal',
+  CO: 'Colombia',
+  CL: 'Chile',
+  PE: 'Perú',
+  US: 'Estados Unidos',
+  '??': 'Desconocido',
+}
+
 export function flagFor(code: string): string {
   return FLAGS[code] ?? '🏳️'
+}
+
+export function countryNameFor(code: string): string {
+  return COUNTRY_NAMES[code] ?? code
 }
 
 const DEMO_TABLE: { country: string; countryCode: string; city: string }[] = [

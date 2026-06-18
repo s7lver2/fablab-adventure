@@ -100,4 +100,20 @@ export class EventLogger {
       durationMs: r.last_seen_at - r.started_at, eventCount: r.event_count,
     }))
   }
+
+  topCountries(days = 30): { country: string; count: number }[] {
+    const since = Date.now() - days * 86400000
+    const rows = this.db
+      .prepare('SELECT country, COUNT(*) as count FROM events WHERE country IS NOT NULL AND created_at > ? GROUP BY country ORDER BY count DESC LIMIT 10')
+      .all(since) as { country: string; count: number }[]
+    return rows
+  }
+
+  topCities(days = 30): { country: string; city: string; count: number }[] {
+    const since = Date.now() - days * 86400000
+    const rows = this.db
+      .prepare('SELECT country, city, COUNT(*) as count FROM events WHERE city IS NOT NULL AND created_at > ? GROUP BY country, city ORDER BY count DESC LIMIT 10')
+      .all(since) as { country: string; city: string; count: number }[]
+    return rows
+  }
 }
