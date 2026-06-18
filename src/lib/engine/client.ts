@@ -20,6 +20,17 @@ export function runInWorker(code: string, input: unknown, language: Language = '
       })
     }, TIMEOUT_MS)
 
+    worker.onerror = (ev) => {
+      clearTimeout(timer)
+      worker.terminate()
+      resolve({ output: '', error: `No se pudo ejecutar el código (worker): ${ev.message || 'error al cargar el worker'}`, timeMs: 0 })
+    }
+    worker.onmessageerror = () => {
+      clearTimeout(timer)
+      worker.terminate()
+      resolve({ output: '', error: 'No se pudo leer el resultado del worker.', timeMs: 0 })
+    }
+
     worker.onmessage = (e: MessageEvent<RunResult>) => {
       clearTimeout(timer)
       worker.terminate()
