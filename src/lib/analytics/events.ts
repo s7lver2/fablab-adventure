@@ -116,4 +116,42 @@ export class EventLogger {
       .all(since) as { country: string; city: string; count: number }[]
     return rows
   }
+
+  byDayHour(days = 30): number[][] {
+    const since = Date.now() - days * 86400000
+    const grid: number[][] = Array.from({ length: 7 }, () => new Array(24).fill(0))
+    const rows = this.db
+      .prepare('SELECT created_at FROM events WHERE created_at > ?')
+      .all(since) as { created_at: number }[]
+    for (const r of rows) {
+      const d = new Date(r.created_at)
+      const day = (d.getDay() + 6) % 7 // Mon=0..Sun=6
+      grid[day][d.getHours()]++
+    }
+    return grid
+  }
+
+  pageSeries(days = 7, topN = 4): { labels: string[]; series: { path: string; data: number[] }[] } {
+    const since = Date.now() - days * 86400000
+    const dayKeys: string[] = []
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 86400000)
+      dayKeys.push(`${d.getMonth() + 1}/${d.getDate()}`)
+    }
+    const top = this.db
+      .prepare("SELECT path, COUNT(*) c FROM events WHERE path IS NOT NULL AND path != '' AND created_at > ? GROUP BY path ORDER BY c DESC LIMIT ?")
+      .all(since, topN) as { path: string; c: number }[]
+    const series = top.map((t) => {
+      const data = new Array(days).fill(0)
+      const rows = this.db
+        .prepare('SELECT created_at FROM events WHERE path = ? AND created_at > ?')
+        .all(t.path, since) as { created_at: number }[]
+      for (const r of rows) {
+        const idx = days - 1 - Math.floor((Date.now() - r.created_at) / 86400000)
+        if (idx >= 0 && idx < days) data[idx]++
+      }
+      return { path: t.path, data }
+    })
+    return { labels: dayKeys, series }
+  }
 }

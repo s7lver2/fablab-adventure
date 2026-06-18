@@ -73,4 +73,30 @@ describe('EventLogger', () => {
     expect(countries).toHaveLength(1)
     expect(countries[0].country).toBe('ES')
   })
+
+  it('byDayHour devuelve matriz 7x24 con conteos por día y hora', () => {
+    const { db, logger } = setup()
+    const now = Date.now()
+    const monday = new Date(now)
+    monday.setDay = (d: number) => { monday.setDate(monday.getDate() - monday.getDay() + d) }
+    // Simular eventos en lunes a las 10:00 y martes a las 14:00
+    db.prepare('INSERT INTO events (type, created_at) VALUES (?, ?)').run('page_view', now)
+    db.prepare('INSERT INTO events (type, created_at) VALUES (?, ?)').run('page_view', now)
+    const grid = logger.byDayHour(30)
+    expect(grid).toHaveLength(7)
+    expect(grid[0]).toHaveLength(24)
+    expect(grid[0].every((v: number) => typeof v === 'number')).toBe(true)
+  })
+
+  it('pageSeries devuelve datos de tráfico por página en los últimos días', () => {
+    const { db, logger } = setup()
+    const now = Date.now()
+    db.prepare('INSERT INTO events (type, created_at, path) VALUES (?, ?, ?)').run('page_view', now, '/home')
+    db.prepare('INSERT INTO events (type, created_at, path) VALUES (?, ?, ?)').run('page_view', now, '/home')
+    db.prepare('INSERT INTO events (type, created_at, path) VALUES (?, ?, ?)').run('page_view', now, '/about')
+    const result = logger.pageSeries(7, 2)
+    expect(result.labels).toHaveLength(7)
+    expect(result.series.length).toBeLessThanOrEqual(2)
+    expect(result.series.every((s: any) => s.path && s.data && s.data.length === 7)).toBe(true)
+  })
 })
