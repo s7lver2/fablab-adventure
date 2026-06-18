@@ -17,24 +17,24 @@ function slug(path: string) {
 }
 
 function eventColor(type: string) {
-  if (type.includes('pass') || type.includes('complete')) return 'var(--color-text-success)'
-  if (type.includes('fail') || type.includes('error')) return 'var(--color-text-danger)'
-  if (type.includes('appeal')) return 'var(--color-text-warning)'
-  return 'var(--color-text-info)'
+  if (type.includes('pass') || type.includes('complete')) return 'var(--adm-success)'
+  if (type.includes('fail') || type.includes('error')) return 'var(--adm-error)'
+  if (type.includes('appeal')) return 'var(--adm-warning)'
+  return 'var(--adm-accent)'
 }
 
-const AVATAR_BG = ['var(--color-background-info)', 'var(--color-background-success)', 'var(--color-background-warning)', 'var(--color-background-danger)']
-const AVATAR_FG = ['var(--color-text-info)', 'var(--color-text-success)', 'var(--color-text-warning)', 'var(--color-text-danger)']
+const AVATAR_BG = ['var(--adm-bg-secondary)', 'var(--adm-bg-secondary)', 'var(--adm-bg-secondary)', 'var(--adm-bg-secondary)']
+const AVATAR_FG = ['var(--adm-accent)', 'var(--adm-success)', 'var(--adm-warning)', 'var(--adm-error)']
 
 function sec(children: React.ReactNode) {
-  return <div style={{ border: '0.5px solid var(--color-border-tertiary)', borderRadius: 'var(--border-radius-lg)', overflow: 'hidden' }}>{children}</div>
+  return <div style={{ border: '1px solid var(--adm-border)', borderRadius: 'var(--adm-radius)', overflow: 'hidden' }}>{children}</div>
 }
 
 function sh(title: string, sub?: string) {
   return (
-    <div style={{ padding: '0.75rem 1rem', borderBottom: '0.5px solid var(--color-border-tertiary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)' }}>{title}</span>
-      {sub && <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)' }}>{sub}</span>}
+    <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--adm-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--adm-text-primary)' }}>{title}</span>
+      {sub && <span style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-text-tertiary)' }}>{sub}</span>}
     </div>
   )
 }
@@ -54,10 +54,10 @@ export default function AdminLivePage() {
   return (
     <div style={{ padding: '1.25rem' }}>
       <div style={{ marginBottom: '1rem' }}>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>tiempo real</div>
+        <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-text-tertiary)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>actividad en vivo</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontSize: 17, fontWeight: 500, color: 'var(--color-text-primary)' }}>En vivo</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-success)' }}>
+          <div style={{ fontSize: 17, fontWeight: 500, color: 'var(--adm-text-primary)' }}>En vivo</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'var(--adm-font-mono)', fontSize: 11, color: 'var(--adm-success)' }}>
             <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'currentColor', display: 'inline-block' }} />
             {data?.activeCount ?? 0} activos · actualiza cada 10s
           </div>
@@ -70,10 +70,10 @@ export default function AdminLivePage() {
           { label: 'eventos recientes', value: data?.recentEvents.length ?? 0, delta: 'en ventana de 5 min' },
           { label: 'reto más activo', value: topSlug },
         ].map((k) => (
-          <div key={k.label} style={{ background: 'var(--color-background-secondary)', borderRadius: 'var(--border-radius-md)', padding: '0.875rem' }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', marginBottom: 6 }}>{k.label}</div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 18, fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{k.value}</div>
-            {k.delta && <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-success)' }}>{k.delta}</div>}
+          <div key={k.label} style={{ background: 'var(--adm-bg-secondary)', borderRadius: 'var(--adm-radius-sm)', padding: '0.875rem' }}>
+            <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-text-tertiary)', marginBottom: 6 }}>{k.label}</div>
+            <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 18, fontWeight: 500, color: 'var(--adm-text-primary)', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{k.value}</div>
+            {k.delta && <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-success)' }}>{k.delta}</div>}
           </div>
         ))}
       </div>
@@ -82,31 +82,31 @@ export default function AdminLivePage() {
         {sec(<>
           {sh('Alumnos conectados', 'últimos 5 min')}
           {!data?.activeStudents.length && (
-            <div style={{ padding: '1rem', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-secondary)' }}>Sin actividad reciente</div>
+            <div style={{ padding: '1rem', fontFamily: 'var(--adm-font-mono)', fontSize: 11, color: 'var(--adm-text-secondary)' }}>Sin actividad reciente</div>
           )}
           {data?.activeStudents.map((s, i) => (
-            <div key={s.userId} style={{ padding: '0.55rem 1rem', borderBottom: '0.5px solid var(--color-border-tertiary)', display: 'flex', alignItems: 'center', gap: 10, fontSize: 12 }}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--color-text-success)', flexShrink: 0 }} />
-              <div style={{ width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 500, background: AVATAR_BG[i % 4], color: AVATAR_FG[i % 4], flexShrink: 0 }}>
+            <div key={s.userId} style={{ padding: '0.55rem 1rem', borderBottom: '1px solid var(--adm-border)', display: 'flex', alignItems: 'center', gap: 10, fontSize: 12 }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--adm-success)', flexShrink: 0 }} />
+              <div style={{ width: 26, height: 26, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--adm-font-mono)', fontSize: 10, fontWeight: 500, background: AVATAR_BG[i % 4], color: AVATAR_FG[i % 4], flexShrink: 0 }}>
                 {s.username.slice(0, 2).toUpperCase()}
               </div>
-              <span style={{ flex: 1, fontWeight: 500, color: 'var(--color-text-primary)' }}>{s.username}</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-success)' }}>{slug(s.currentPath)}</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)' }}>{timeAgo(s.lastSeenMs)}</span>
+              <span style={{ flex: 1, fontWeight: 500, color: 'var(--adm-text-primary)' }}>{s.username}</span>
+              <span style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-success)' }}>{slug(s.currentPath)}</span>
+              <span style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-text-secondary)' }}>{timeAgo(s.lastSeenMs)}</span>
             </div>
           ))}
         </>)}
 
         {sec(<>
           {sh('Eventos en tiempo real')}
-          <div style={{ padding: '0.5rem 1rem', fontFamily: 'var(--font-mono)', fontSize: 11, display: 'flex', flexDirection: 'column', gap: 5 }}>
-            {!data?.recentEvents.length && <span style={{ color: 'var(--color-text-secondary)' }}>Sin eventos recientes</span>}
+          <div style={{ padding: '0.5rem 1rem', fontFamily: 'var(--adm-font-mono)', fontSize: 11, display: 'flex', flexDirection: 'column', gap: 5 }}>
+            {!data?.recentEvents.length && <span style={{ color: 'var(--adm-text-secondary)' }}>Sin eventos recientes</span>}
             {data?.recentEvents.slice(0, 10).map((e, i) => (
               <div key={i} style={{ display: 'flex', gap: 8, flexWrap: 'nowrap', overflow: 'hidden' }}>
-                <span style={{ color: 'var(--color-text-secondary)', flexShrink: 0 }}>{new Date(e.timestamp).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                <span style={{ color: 'var(--adm-text-secondary)', flexShrink: 0 }}>{new Date(e.timestamp).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
                 <span style={{ color: eventColor(e.type), flexShrink: 0 }}>{e.type.split(':').pop()?.toUpperCase() ?? e.type}</span>
-                <span style={{ color: 'var(--color-text-primary)', flexShrink: 0 }}>{e.username}</span>
-                <span style={{ color: 'var(--color-text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>→ {slug(e.path)}</span>
+                <span style={{ color: 'var(--adm-text-primary)', flexShrink: 0 }}>{e.username}</span>
+                <span style={{ color: 'var(--adm-text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>→ {slug(e.path)}</span>
               </div>
             ))}
           </div>

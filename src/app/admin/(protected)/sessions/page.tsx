@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Chart from 'chart.js/auto'
+import { chartTheme } from '../components/adminUi'
 
 interface SessionRow {
   sessionId: string
@@ -21,8 +22,8 @@ function sec(children: React.ReactNode) {
   return (
     <div
       style={{
-        border: '0.5px solid var(--color-border-tertiary)',
-        borderRadius: 'var(--border-radius-lg)',
+        border: '1px solid var(--adm-border)',
+        borderRadius: 'var(--adm-radius)',
         overflow: 'hidden',
       }}
     >
@@ -36,21 +37,21 @@ function sh(title: string, sub?: string) {
     <div
       style={{
         padding: '0.75rem 1rem',
-        borderBottom: '0.5px solid var(--color-border-tertiary)',
+        borderBottom: '1px solid var(--adm-border)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
       }}
     >
-      <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)' }}>
+      <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--adm-text-primary)' }}>
         {title}
       </span>
       {sub && (
         <span
           style={{
-            fontFamily: 'var(--font-mono)',
+            fontFamily: 'var(--adm-font-mono)',
             fontSize: 10,
-            color: 'var(--color-text-secondary)',
+            color: 'var(--adm-text-tertiary)',
           }}
         >
           {sub}
@@ -74,16 +75,16 @@ function KPI({
   return (
     <div
       style={{
-        background: 'var(--color-background-secondary)',
-        borderRadius: 'var(--border-radius-md)',
+        background: 'var(--adm-bg-secondary)',
+        borderRadius: 'var(--adm-radius-sm)',
         padding: '0.875rem',
       }}
     >
       <div
         style={{
-          fontFamily: 'var(--font-mono)',
+          fontFamily: 'var(--adm-font-mono)',
           fontSize: 10,
-          color: 'var(--color-text-secondary)',
+          color: 'var(--adm-text-tertiary)',
           marginBottom: 6,
         }}
       >
@@ -91,10 +92,10 @@ function KPI({
       </div>
       <div
         style={{
-          fontFamily: 'var(--font-mono)',
+          fontFamily: 'var(--adm-font-mono)',
           fontSize: 20,
           fontWeight: 500,
-          color: danger ? 'var(--color-text-danger)' : 'var(--color-text-primary)',
+          color: danger ? 'var(--adm-error)' : 'var(--adm-text-primary)',
           marginBottom: 3,
         }}
       >
@@ -103,9 +104,9 @@ function KPI({
       {delta && (
         <div
           style={{
-            fontFamily: 'var(--font-mono)',
+            fontFamily: 'var(--adm-font-mono)',
             fontSize: 10,
-            color: danger ? 'var(--color-text-danger)' : 'var(--color-text-success)',
+            color: danger ? 'var(--adm-error)' : 'var(--adm-success)',
           }}
         >
           {delta}
@@ -130,13 +131,11 @@ export default function SessionsPage() {
     if (!data || !durationRef.current) return
     durationChart.current?.destroy()
 
-    const style = getComputedStyle(document.documentElement)
-    const grd = style.getPropertyValue('--color-border-tertiary').trim()
-    const txt = style.getPropertyValue('--color-text-secondary').trim()
+    const theme = chartTheme()
     const scale = {
-      grid: { color: grd },
+      grid: { color: theme.gridColor },
       border: { display: false as const },
-      ticks: { color: txt, font: { family: 'monospace', size: 10 } },
+      ticks: { color: theme.textColor, font: { family: 'monospace', size: 10 } },
     }
 
     // Group sessions by duration buckets
@@ -158,7 +157,7 @@ export default function SessionsPage() {
         datasets: [
           {
             data: counts,
-            backgroundColor: '#1D9E75',
+            backgroundColor: '#10b981',
             borderRadius: 2,
             borderWidth: 0,
           },
@@ -176,14 +175,65 @@ export default function SessionsPage() {
     }
   }, [data])
 
+  // Listen for theme change events to reinitialize chart
+  useEffect(() => {
+    const handleThemeChange = () => {
+      durationChart.current?.destroy()
+      durationChart.current = null
+      // Trigger chart reinitialization
+      if (data && durationRef.current) {
+        const theme = chartTheme()
+        const scale = {
+          grid: { color: theme.gridColor },
+          border: { display: false as const },
+          ticks: { color: theme.textColor, font: { family: 'monospace', size: 10 } },
+        }
+
+        const buckets = [
+          { label: '< 1 min', max: 60000 },
+          { label: '1–5 min', max: 300000 },
+          { label: '5–15 min', max: 900000 },
+          { label: '> 15 min', max: Infinity },
+        ]
+
+        const counts = buckets.map((b) =>
+          data.sessions.filter((s) => s.durationMs < b.max && s.durationMs >= (buckets[buckets.indexOf(b) - 1]?.max ?? 0)).length
+        )
+
+        durationChart.current = new Chart(durationRef.current.getContext('2d')!, {
+          type: 'bar',
+          data: {
+            labels: buckets.map((b) => b.label),
+            datasets: [
+              {
+                data: counts,
+                backgroundColor: '#10b981',
+                borderRadius: 2,
+                borderWidth: 0,
+              },
+            ],
+          },
+          options: {
+            animation: false,
+            plugins: { legend: { display: false } },
+            scales: { x: scale, y: scale },
+          },
+        })
+      }
+    }
+
+    window.addEventListener('adm-theme-change', handleThemeChange)
+    return () => window.removeEventListener('adm-theme-change', handleThemeChange)
+  }, [data])
+
   if (!data) {
     return (
       <div
         style={{
           padding: '1.25rem',
-          fontFamily: 'var(--font-mono)',
+          fontFamily: 'var(--adm-font-mono)',
           fontSize: 12,
-          color: 'var(--color-text-secondary)',
+          color: 'var(--adm-text-secondary)',
         }}
       >
         Cargando…
@@ -198,9 +248,9 @@ export default function SessionsPage() {
       <div style={{ marginBottom: '1rem' }}>
         <div
           style={{
-            fontFamily: 'var(--font-mono)',
+            fontFamily: 'var(--adm-font-mono)',
             fontSize: 10,
-            color: 'var(--color-text-secondary)',
+            color: 'var(--adm-text-tertiary)',
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
             marginBottom: 3,
@@ -212,7 +262,7 @@ export default function SessionsPage() {
           style={{
             fontSize: 17,
             fontWeight: 500,
-            color: 'var(--color-text-primary)',
+            color: 'var(--adm-text-primary)',
           }}
         >
           Detalles de sesiones
@@ -243,9 +293,9 @@ export default function SessionsPage() {
             <div
               style={{
                 padding: '0.75rem 1rem',
-                fontFamily: 'var(--font-mono)',
+                fontFamily: 'var(--adm-font-mono)',
                 fontSize: 11,
-                color: 'var(--color-text-secondary)',
+                color: 'var(--adm-text-secondary)',
               }}
             >
               Sin sesiones aún
@@ -263,8 +313,8 @@ export default function SessionsPage() {
                 <thead>
                   <tr
                     style={{
-                      borderBottom: '0.5px solid var(--color-border-tertiary)',
-                      backgroundColor: 'var(--color-background-secondary)',
+                      borderBottom: '1px solid var(--adm-border)',
+                      backgroundColor: 'var(--adm-bg-secondary)',
                     }}
                   >
                     <th
@@ -273,8 +323,8 @@ export default function SessionsPage() {
                         textAlign: 'left',
                         fontWeight: 600,
                         fontSize: 11,
-                        color: 'var(--color-text-secondary)',
-                        fontFamily: 'var(--font-mono)',
+                        color: 'var(--adm-text-tertiary)',
+                        fontFamily: 'var(--adm-font-mono)',
                       }}
                     >
                       ALUMNO
@@ -285,8 +335,8 @@ export default function SessionsPage() {
                         textAlign: 'left',
                         fontWeight: 600,
                         fontSize: 11,
-                        color: 'var(--color-text-secondary)',
-                        fontFamily: 'var(--font-mono)',
+                        color: 'var(--adm-text-tertiary)',
+                        fontFamily: 'var(--adm-font-mono)',
                       }}
                     >
                       INICIO
@@ -297,8 +347,8 @@ export default function SessionsPage() {
                         textAlign: 'left',
                         fontWeight: 600,
                         fontSize: 11,
-                        color: 'var(--color-text-secondary)',
-                        fontFamily: 'var(--font-mono)',
+                        color: 'var(--adm-text-tertiary)',
+                        fontFamily: 'var(--adm-font-mono)',
                       }}
                     >
                       DURACIÓN
@@ -309,8 +359,8 @@ export default function SessionsPage() {
                         textAlign: 'left',
                         fontWeight: 600,
                         fontSize: 11,
-                        color: 'var(--color-text-secondary)',
-                        fontFamily: 'var(--font-mono)',
+                        color: 'var(--adm-text-tertiary)',
+                        fontFamily: 'var(--adm-font-mono)',
                       }}
                     >
                       EVENTOS
@@ -321,8 +371,8 @@ export default function SessionsPage() {
                         textAlign: 'left',
                         fontWeight: 600,
                         fontSize: 11,
-                        color: 'var(--color-text-secondary)',
-                        fontFamily: 'var(--font-mono)',
+                        color: 'var(--adm-text-tertiary)',
+                        fontFamily: 'var(--adm-font-mono)',
                       }}
                     >
                       DISPOSITIVO
@@ -333,8 +383,8 @@ export default function SessionsPage() {
                         textAlign: 'left',
                         fontWeight: 600,
                         fontSize: 11,
-                        color: 'var(--color-text-secondary)',
-                        fontFamily: 'var(--font-mono)',
+                        color: 'var(--adm-text-tertiary)',
+                        fontFamily: 'var(--adm-font-mono)',
                       }}
                     >
                       NAVEGADOR
@@ -346,13 +396,13 @@ export default function SessionsPage() {
                     <tr
                       key={s.sessionId}
                       style={{
-                        borderBottom: '0.5px solid var(--color-border-tertiary)',
+                        borderBottom: '1px solid var(--adm-border)',
                       }}
                     >
                       <td
                         style={{
                           padding: '0.65rem 1rem',
-                          color: 'var(--color-text-primary)',
+                          color: 'var(--adm-text-primary)',
                         }}
                       >
                         {s.username}
@@ -360,8 +410,8 @@ export default function SessionsPage() {
                       <td
                         style={{
                           padding: '0.65rem 1rem',
-                          color: 'var(--color-text-secondary)',
-                          fontFamily: 'var(--font-mono)',
+                          color: 'var(--adm-text-secondary)',
+                          fontFamily: 'var(--adm-font-mono)',
                           fontSize: 11,
                         }}
                       >
@@ -370,8 +420,8 @@ export default function SessionsPage() {
                       <td
                         style={{
                           padding: '0.65rem 1rem',
-                          color: 'var(--color-text-primary)',
-                          fontFamily: 'var(--font-mono)',
+                          color: 'var(--adm-text-primary)',
+                          fontFamily: 'var(--adm-font-mono)',
                         }}
                       >
                         {Math.round(s.durationMs / 1000)}s
@@ -379,8 +429,8 @@ export default function SessionsPage() {
                       <td
                         style={{
                           padding: '0.65rem 1rem',
-                          color: 'var(--color-text-primary)',
-                          fontFamily: 'var(--font-mono)',
+                          color: 'var(--adm-text-primary)',
+                          fontFamily: 'var(--adm-font-mono)',
                         }}
                       >
                         {s.eventCount}
@@ -388,7 +438,7 @@ export default function SessionsPage() {
                       <td
                         style={{
                           padding: '0.65rem 1rem',
-                          color: 'var(--color-text-secondary)',
+                          color: 'var(--adm-text-secondary)',
                         }}
                       >
                         {s.device || '—'}
@@ -396,7 +446,7 @@ export default function SessionsPage() {
                       <td
                         style={{
                           padding: '0.65rem 1rem',
-                          color: 'var(--color-text-secondary)',
+                          color: 'var(--adm-text-secondary)',
                         }}
                       >
                         {s.browser || '—'}
