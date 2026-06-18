@@ -1,4 +1,5 @@
 import type Database from 'better-sqlite3'
+import { lookupGeo } from '@/lib/analytics/geo'
 
 export interface EventInput {
   type: string
@@ -8,6 +9,7 @@ export interface EventInput {
   userAgent?: string
   referrer?: string
   meta?: Record<string, unknown>
+  clientIp?: string
 }
 
 export interface EventRecord {
@@ -20,6 +22,8 @@ export interface EventRecord {
   referrer: string
   meta: Record<string, unknown>
   createdAt: number
+  country?: string | null
+  city?: string | null
 }
 
 export interface SessionSummary {
@@ -35,12 +39,14 @@ export interface SessionSummary {
 interface RawRow {
   id: number; type: string; user_id: number | null; path: string; session_id: string
   user_agent: string; referrer: string; meta_json: string; created_at: number
+  country?: string | null; city?: string | null
 }
 
 function toRecord(r: RawRow): EventRecord {
   return {
     id: r.id, type: r.type, userId: r.user_id, path: r.path, sessionId: r.session_id,
     userAgent: r.user_agent, referrer: r.referrer, meta: JSON.parse(r.meta_json), createdAt: r.created_at,
+    country: r.country ?? null, city: r.city ?? null,
   }
 }
 
@@ -48,13 +54,14 @@ export class EventLogger {
   constructor(private db: Database.Database) {}
 
   log(e: EventInput): void {
+    const geo = lookupGeo(e.clientIp || '0.0.0.0')
     this.db
       .prepare(
-        `INSERT INTO events (type, user_id, path, session_id, user_agent, referrer, meta_json, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO events (type, user_id, path, session_id, user_agent, referrer, meta_json, country, city, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .run(e.type, e.userId ?? null, e.path ?? '', e.sessionId ?? '', e.userAgent ?? '',
-        e.referrer ?? '', JSON.stringify(e.meta ?? {}), Date.now())
+        e.referrer ?? '', JSON.stringify(e.meta ?? {}), geo.country, geo.city, Date.now())
   }
 
   listAll(): EventRecord[] {

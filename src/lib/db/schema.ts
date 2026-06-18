@@ -96,6 +96,19 @@ export function createSchema(db: Database.Database): void {
   } catch {
     // columna ya existe
   }
+
+  // Migración idempotente: añadir country y city a events
+  try {
+    db.exec("ALTER TABLE events ADD COLUMN country TEXT")
+  } catch {
+    // columna ya existe
+  }
+  try {
+    db.exec("ALTER TABLE events ADD COLUMN city TEXT")
+  } catch {
+    // columna ya existe
+  }
+
   seedRoot(db)
 }
 
