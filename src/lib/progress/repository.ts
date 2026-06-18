@@ -140,7 +140,7 @@ export class ProgressRepository {
     if (parts.length === 0) {
       // No parts = legacy single-part challenge, check main progress
       const progress = this.get(userId, challengeId)
-      return progress?.status === 'completed' ?? false
+      return progress?.status === 'completed'
     }
 
     // Check if all parts are completed
