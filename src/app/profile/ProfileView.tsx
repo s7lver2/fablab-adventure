@@ -7,6 +7,7 @@ import type { PublicProfile } from '@/lib/users/profileStats'
 export function ProfileView({ profile }: { profile: PublicProfile }) {
   const [displayName, setDisplayName] = useState(profile.displayName)
   const [avatar, setAvatar] = useState(profile.avatar)
+  const [avatarImage, setAvatarImage] = useState<string | null>(profile.avatarImage ?? null)
   const [profileMessage, setProfileMessage] = useState(profile.profileMessage)
   const [banner, setBanner] = useState(profile.banner || 'preset:sunset')
   const [bannerImage, setBannerImage] = useState<string | null>(profile.bannerImage)
@@ -14,15 +15,15 @@ export function ProfileView({ profile }: { profile: PublicProfile }) {
   const [error, setError] = useState('')
   const [resetting, setResetting] = useState(false)
 
-  const [d, setD] = useState({ displayName, avatar, profileMessage, banner, bannerImage })
+  const [d, setD] = useState({ displayName, avatar, avatarImage, profileMessage, banner, bannerImage })
 
   function openEdit() {
-    setD({ displayName, avatar, profileMessage, banner, bannerImage })
+    setD({ displayName, avatar, avatarImage, profileMessage, banner, bannerImage })
     setError('')
     setEditing(true)
   }
 
-  function onPickFile(e: React.ChangeEvent<HTMLInputElement>) {
+  function onPickBannerFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
     if (!/^image\/(png|jpeg|jpg|webp|gif)$/.test(file.type)) {
@@ -35,6 +36,22 @@ export function ProfileView({ profile }: { profile: PublicProfile }) {
     }
     const reader = new FileReader()
     reader.onload = () => setD((s) => ({ ...s, banner: 'upload', bannerImage: String(reader.result) }))
+    reader.readAsDataURL(file)
+  }
+
+  function onPickAvatarFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!/^image\/(png|jpeg|jpg|webp|gif)$/.test(file.type)) {
+      setError('Formato de imagen no válido.')
+      return
+    }
+    if (file.size > 500 * 1024) {
+      setError('La imagen supera los 500 KB.')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => setD((s) => ({ ...s, avatarImage: String(reader.result) }))
     reader.readAsDataURL(file)
   }
 
@@ -53,6 +70,7 @@ export function ProfileView({ profile }: { profile: PublicProfile }) {
     }
     setDisplayName(d.displayName)
     setAvatar(d.avatar)
+    setAvatarImage(d.avatarImage)
     setProfileMessage(d.profileMessage)
     setBanner(d.banner)
     setBannerImage(d.bannerImage)
@@ -78,6 +96,33 @@ export function ProfileView({ profile }: { profile: PublicProfile }) {
           <div className="field">
             <label className="field__label">Avatar (un emoji)</label>
             <input value={d.avatar} onChange={(e) => setD((s) => ({ ...s, avatar: e.target.value }))} />
+          </div>
+          <div className="field">
+            <label className="field__label">Imagen de avatar (opcional)</label>
+            <input type="file" accept="image/*" onChange={onPickAvatarFile} style={{ boxShadow: 'none' }} />
+            {d.avatarImage && (
+              <div
+                style={{
+                  width: 80,
+                  height: 80,
+                  marginTop: 8,
+                  borderRadius: 40,
+                  background: `center / cover no-repeat url("${d.avatarImage}")`,
+                  border: '3px solid var(--violet)',
+                  boxShadow: '0 4px 0 var(--violet-dark)',
+                }}
+              />
+            )}
+            {d.avatarImage && (
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => setD((s) => ({ ...s, avatarImage: null }))}
+                style={{ marginTop: '0.5rem', fontSize: '0.85rem' }}
+              >
+                ✕ Eliminar imagen
+              </button>
+            )}
           </div>
           <div className="field">
             <label className="field__label">
@@ -116,7 +161,7 @@ export function ProfileView({ profile }: { profile: PublicProfile }) {
             <label className="field__label" style={{ marginTop: 10 }}>
               O sube una imagen (máx. 500 KB)
             </label>
-            <input type="file" accept="image/*" onChange={onPickFile} style={{ boxShadow: 'none' }} />
+            <input type="file" accept="image/*" onChange={onPickBannerFile} style={{ boxShadow: 'none' }} />
             {d.banner === 'upload' && d.bannerImage && (
               <div
                 style={{
@@ -138,7 +183,7 @@ export function ProfileView({ profile }: { profile: PublicProfile }) {
     )
   }
 
-  const local: PublicProfile = { ...profile, displayName, avatar, profileMessage, banner, bannerImage }
+  const local: PublicProfile = { ...profile, displayName, avatar, avatarImage, profileMessage, banner, bannerImage }
 
   return (
     <>

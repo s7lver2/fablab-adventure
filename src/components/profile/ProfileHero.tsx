@@ -1,12 +1,16 @@
 'use client'
 
 import { BadgeRow, Badge } from './BadgeRow'
+import { bannerCss } from '@/lib/users/banners'
 
 export interface ProfileHeroProps {
   profile: {
     avatar: string
+    avatarImage?: string | null
     displayName: string
     username: string
+    banner?: string
+    bannerImage?: string | null
   }
   badges?: Badge[]
   action?: React.ReactNode
@@ -17,11 +21,15 @@ export function ProfileHero({
   badges = [],
   action,
 }: ProfileHeroProps) {
+  const avatarContent = profile.avatarImage
+    ? <img src={profile.avatarImage} alt={profile.displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+    : profile.avatar || '🦊'
+
   return (
     <div className="pf-card">
-      <div className="pf-banner" />
+      <div className="pf-banner" style={{ background: bannerCss(profile.banner || 'preset:sunset', profile.bannerImage || null) }} />
       <div className="pf-body">
-        <div className="pf-avatar">{profile.avatar || '🦊'}</div>
+        <div className="pf-avatar">{avatarContent}</div>
         <h1 className="pf-name">{profile.displayName}</h1>
         <div className="pf-handle-row">
           <span className="pf-handle">@{profile.username}</span>

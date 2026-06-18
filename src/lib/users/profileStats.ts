@@ -25,6 +25,7 @@ export interface PublicProfile {
   username: string
   displayName: string
   avatar: string
+  avatarImage: string | null
   banner: string
   bannerImage: string | null
   profileMessage: string
@@ -93,6 +94,7 @@ export function buildProfile(db: Database.Database, user: User): PublicProfile {
     username: user.username,
     displayName: user.displayName,
     avatar: user.avatar,
+    avatarImage: user.avatarImage,
     banner: user.banner,
     bannerImage: user.bannerImage,
     profileMessage: user.profileMessage,
