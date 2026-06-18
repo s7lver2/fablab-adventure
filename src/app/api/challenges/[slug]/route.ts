@@ -25,6 +25,26 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
 
   const variant = challenge.variants[lang] ?? challenge.variants.js ?? null
 
+  // If there are no explicit parts, synthesize one from legacy data
+  const parts = challenge.parts.length > 0
+    ? challenge.parts.map((part) => {
+        const partVariant = part.variants[lang] ?? part.variants.js ?? null
+        return {
+          id: part.id,
+          ord: part.ord,
+          variant: partVariant,
+          inputs: part.testCases.map((tc) => tc.input),
+        }
+      })
+    : [
+        {
+          id: 0,
+          ord: 1,
+          variant,
+          inputs: challenge.testCases.map((tc) => tc.input),
+        },
+      ]
+
   return NextResponse.json({
     slug: challenge.slug,
     title: challenge.title,
@@ -32,5 +52,6 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
     language: lang,
     variant,
     inputs: challenge.testCases.map((tc) => tc.input),
+    parts,
   })
 }

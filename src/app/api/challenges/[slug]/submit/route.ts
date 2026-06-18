@@ -19,18 +19,64 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
   const body = await req.json()
   const producedOutputs: string[] = Array.isArray(body.outputs) ? body.outputs.map(String) : []
   const hintsUsed = Number(body.hintsUsed ?? 0)
+  const partId = body.partId ? Number(body.partId) : null
 
   const curriculum = new CurriculumRepository(db)
   const challenge = curriculum.getChallengeBySlug(slug)
   if (!challenge) return NextResponse.json({ error: 'Reto no encontrado.' }, { status: 404 })
 
   const progress = new ProgressRepository(db)
+
+  // Handle multi-part submission
+  if (partId !== null) {
+    // Grade a specific part
+    const part = challenge.parts.find((p) => p.id === partId)
+    if (!part) return NextResponse.json({ error: 'Parte no encontrada.' }, { status: 404 })
+
+    const { correct, stars } = gradeSubmission({
+      producedOutputs,
+      testCases: part.testCases,
+      attempts: 1, // TODO: track attempts per part
+      hintsUsed,
+    })
+
+    progress.recordPartCompletion(user.id, partId, stars)
+
+    // Check if all parts are now complete
+    const allComplete = progress.areAllPartsCompleted(user.id, challenge.id)
+    if (allComplete) {
+      const challengeStars = progress.getAveragePartStars(user.id, challenge.id)
+      progress.recordAttempt(user.id, challenge.id, { stars: challengeStars, hintsUsed, completed: true })
+    }
+
+    // Find next part
+    const nextPart = challenge.parts.find((p) => !progress.getPartProgress(user.id, p.id)?.completedAt)
+
+    await recordEvent(new EventLogger(db), {
+      type: 'submit',
+      userId: user.id,
+      path: `/api/challenges/${slug}/submit`,
+      meta: { slug, partId, correct, stars },
+    })
+
+    const next = nextChallengeSlug(curriculum.listChallenges(), progress.completedChallengeIds(user.id))
+    return NextResponse.json({
+      correct,
+      stars,
+      nextPartId: nextPart?.id ?? null,
+      challengeComplete: allComplete,
+      next,
+    })
+  }
+
+  // Legacy: grade entire challenge (no parts)
   const prev = progress.get(user.id, challenge.id)
   const attempts = (prev?.attempts ?? 0) + 1
 
+  const testCases = challenge.parts.length > 0 ? challenge.parts[0]?.testCases ?? [] : challenge.testCases
   const { correct, stars } = gradeSubmission({
     producedOutputs,
-    testCases: challenge.testCases,
+    testCases,
     attempts,
     hintsUsed,
   })
@@ -45,5 +91,5 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
   })
 
   const next = nextChallengeSlug(curriculum.listChallenges(), progress.completedChallengeIds(user.id))
-  return NextResponse.json({ correct, stars, next })
+  return NextResponse.json({ correct, stars, next, challengeComplete: correct })
 }
