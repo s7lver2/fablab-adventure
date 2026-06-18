@@ -20,8 +20,8 @@ export async function PATCH(req: Request) {
     displayName: String(body.displayName ?? ''),
     avatar: String(body.avatar ?? ''),
     profileMessage: String(body.profileMessage ?? ''),
-    banner: String(body.banner ?? 'preset:sunset'),
-    bannerImage: body.bannerImage ?? null,
+    banner: String(body.banner ?? ''),
+    bannerImage: body.bannerImage == null ? null : String(body.bannerImage),
   }
   const v = validateProfileUpdate(update)
   if (!v.ok) return NextResponse.json({ error: v.error }, { status: 400 })
