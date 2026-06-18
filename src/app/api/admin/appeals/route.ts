@@ -34,9 +34,16 @@ export async function PATCH(req: Request) {
 
   appeals.resolve(id, status, feedback, user.id)
 
+  // Extract client IP from headers (Cloudflare CF-Connecting-IP, X-Forwarded-For, or fallback)
+  const clientIp = (req.headers.get('cf-connecting-ip') ||
+                    req.headers.get('x-forwarded-for')?.split(',')[0] ||
+                    req.headers.get('x-real-ip') ||
+                    '0.0.0.0').trim()
+
   new EventLogger(db).log({
     type: status === 'accepted' ? 'admin:appeal_accept' : 'admin:appeal_reject',
     userId: user.id,
+    clientIp,
     meta: { appealId: id, reviewedBy: user.username },
   })
 
