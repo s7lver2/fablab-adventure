@@ -33,6 +33,10 @@ const SOLUTIONS: Record<string, string> = {
   'varias-lineas': 'print("Hola")\nprint("me llamo Robot")\nprint("adiós")',
   'si-o-no': 'if (input.edad >= 18) {\n  print("mayor")\n} else {\n  print("menor")\n}',
   calculadora: 'if (input.op === "+") {\n  print(input.a + input.b)\n} else if (input.op === "-") {\n  print(input.a - input.b)\n} else {\n  print(input.a * input.b)\n}',
+  'validador-contrasena':
+    'let s = input.clave\nlet largo = s.length >= 6\nlet tieneNum = false\nfor (let i = 0; i < s.length; i++) {\n  if (s[i] >= "0" && s[i] <= "9") tieneNum = true\n}\nif (largo && tieneNum) print("segura")\nelse print("débil")',
+  'adivina-numero':
+    'for (let i = 0; i < input.intentos.length; i++) {\n  let g = input.intentos[i]\n  if (g < input.secreto) print("más alto")\n  else if (g > input.secreto) print("más bajo")\n  else print("¡acertaste!")\n}',
 }
 
 function seededRepo() {
