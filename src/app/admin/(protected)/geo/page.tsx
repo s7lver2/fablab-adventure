@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Chart from 'chart.js/auto'
-import { chartTheme, INDIGO, INDIGO_RAMP, chartAnim, centerTextPlugin } from '../components/adminUi'
+import { chartTheme, INDIGO, INDIGO_RAMP, chartAnim, centerTextPlugin, DemoBadge } from '../components/adminUi'
 
 interface CountryData {
   country: string
@@ -130,11 +130,16 @@ export default function GeoPage() {
 
   return (
     <div style={{ padding: '1.25rem' }}>
-      <div style={{ marginBottom: '1rem' }}>
+      <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'space-between' }}>
         <div style={{ fontFamily: 'var(--adm-font-display)', fontStyle: 'italic', fontSize: 28, fontWeight: 400, color: 'var(--adm-text-primary)', letterSpacing: '-0.01em', textTransform: 'lowercase' }}>geografía</div>
+        <DemoBadge note="Geolocalización demo · falta geo-IP real" />
       </div>
 
       {/* KPI Cards Section */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+        <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-text-tertiary)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Ubicaciones</div>
+        <DemoBadge note="Geolocalización demo · falta geo-IP real" />
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 8, marginBottom: '1rem' }}>
         <div style={{ background: 'var(--adm-bg-secondary)', borderRadius: 'var(--adm-radius-sm)', padding: '0.875rem' }}>
           <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-text-tertiary)', marginBottom: 6 }}>total ubicaciones</div>
@@ -155,7 +160,10 @@ export default function GeoPage() {
         {/* Countries Bar Chart */}
         {sec(
           <>
-            {sh('Top 10 países por sesiones')}
+            <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--adm-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--adm-text-primary)' }}>Top 10 países por sesiones</span>
+              <DemoBadge note="Geolocalización demo · falta geo-IP real" />
+            </div>
             <div style={{ padding: '0.75rem' }}>
               <canvas ref={countriesChartRef} height={250}></canvas>
             </div>
@@ -165,7 +173,10 @@ export default function GeoPage() {
         {/* Cities Doughnut Chart */}
         {sec(
           <>
-            {sh('Top 8 ciudades')}
+            <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--adm-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--adm-text-primary)' }}>Top 8 ciudades</span>
+              <DemoBadge note="Geolocalización demo · falta geo-IP real" />
+            </div>
             <div style={{ padding: '0.75rem', display: 'flex', justifyContent: 'center' }}>
               <canvas ref={citiesChartRef} height={200} style={{ maxWidth: '100%' }}></canvas>
             </div>

@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Chart from 'chart.js/auto'
-import { Card, SectionLabel, INDIGO, INDIGO_2, INDIGO_RAMP, AMBER, chartAnim, areaGradient, glowPlugin, centerTextPlugin, chartTheme } from './components/adminUi'
+import { Card, SectionLabel, INDIGO, INDIGO_2, INDIGO_RAMP, AMBER, chartAnim, areaGradient, glowPlugin, centerTextPlugin, chartTheme, DemoBadge } from './components/adminUi'
 
 interface Summary {
   totalEvents: number
@@ -292,8 +292,9 @@ export default function AdminOverviewPage() {
           </div>
         </Card>
         <Card>
-          <div style={{ padding: '0.75rem 1rem', borderBottom: '0.5px solid var(--adm-border)' }}>
+          <div style={{ padding: '0.75rem 1rem', borderBottom: '0.5px solid var(--adm-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--adm-text)' }}>Lenguajes</span>
+            <DemoBadge />
           </div>
           <div style={{ padding: '0.75rem', display: 'flex', justifyContent: 'center' }}>
             <canvas ref={langRef} width={140} height={140}></canvas>
@@ -337,7 +338,10 @@ export default function AdminOverviewPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: '1rem' }}>
         <Card>
-          <SectionLabel style={{ marginBottom: 10 }}>TOP PAÍSES</SectionLabel>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'space-between', marginBottom: 10 }}>
+            <SectionLabel style={{ marginBottom: 0 }}>TOP PAÍSES</SectionLabel>
+            <DemoBadge />
+          </div>
           {geoData && geoData.countries.length > 0 ? (
             <div>
               {geoData.countries.slice(0, 5).map((country) => (
@@ -355,7 +359,10 @@ export default function AdminOverviewPage() {
         </Card>
 
         <Card>
-          <SectionLabel style={{ marginBottom: 10 }}>SESIONES LOCALIZADAS</SectionLabel>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'space-between', marginBottom: 10 }}>
+            <SectionLabel style={{ marginBottom: 0 }}>SESIONES LOCALIZADAS</SectionLabel>
+            <DemoBadge />
+          </div>
           {geoData && geoData.cities.length > 0 ? (
             <div>
               {geoData.cities.slice(0, 10).map((city, i) => (

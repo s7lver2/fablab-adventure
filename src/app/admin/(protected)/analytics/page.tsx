@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Chart from 'chart.js/auto'
-import { chartTheme, INDIGO, INDIGO_RAMP, chartAnim } from '../components/adminUi'
+import { chartTheme, INDIGO, INDIGO_RAMP, chartAnim, DemoBadge } from '../components/adminUi'
 
 interface Summary { totalEvents: number; sessions: number; activeUsers: number; bounceSessions: number; avgSessionMs: number; byHour: number[] }
 interface StuckRow { challengeId: number; challengeTitle: string; current: number }
@@ -131,7 +131,7 @@ export default function AnalyticsPage() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
-        {sec(<>{sh('Retos por concepto')}<div style={{ padding: '0.75rem' }}><canvas ref={conceptsRef} height={140}></canvas></div></>)}
+        {sec(<>{sh('Retos por concepto', '')}<div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0.75rem 1rem', borderBottom: '1px solid var(--adm-border)' }}><DemoBadge /></div><div style={{ padding: '0.75rem' }}><canvas ref={conceptsRef} height={140}></canvas></div></>)}
         {sec(<>
           {sh('Dónde se atascan')}
           {data.stuck.length === 0 && <div style={{ padding: '0.75rem 1rem', fontFamily: 'var(--adm-font-mono)', fontSize: 11, color: 'var(--adm-text-secondary)' }}>Sin datos de progreso aún</div>}
