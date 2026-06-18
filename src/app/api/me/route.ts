@@ -19,6 +19,7 @@ export async function PATCH(req: Request) {
   const update = {
     displayName: String(body.displayName ?? ''),
     avatar: String(body.avatar ?? ''),
+    avatarImage: body.avatarImage == null ? null : String(body.avatarImage),
     profileMessage: String(body.profileMessage ?? ''),
     banner: String(body.banner ?? ''),
     bannerImage: body.bannerImage == null ? null : String(body.bannerImage),

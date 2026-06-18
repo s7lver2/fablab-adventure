@@ -7,6 +7,7 @@ export interface User {
   username: string
   displayName: string
   avatar: string
+  avatarImage: string | null
   profileMessage: string
   banner: string
   bannerImage: string | null
@@ -20,6 +21,7 @@ export interface User {
 export interface ProfileUpdate {
   displayName: string
   avatar: string
+  avatarImage: string | null
   profileMessage: string
   banner: string
   bannerImage: string | null

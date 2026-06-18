@@ -41,5 +41,15 @@ export function validateProfileUpdate(update: ProfileUpdate): ValidationResult {
     }
   }
 
+  // Validate avatar image (optional)
+  if (update.avatarImage !== null && update.avatarImage !== undefined) {
+    if (!update.avatarImage.match(/^data:image\/(png|jpe?g|webp|gif);base64,/)) {
+      return { ok: false, error: 'La imagen del avatar debe ser PNG, JPEG, WebP o GIF en formato base64.' }
+    }
+    if (update.avatarImage.length > MAX_BANNER_IMAGE_CHARS) {
+      return { ok: false, error: `La imagen del avatar no puede superar ${MAX_BANNER_IMAGE_CHARS} caracteres.` }
+    }
+  }
+
   return { ok: true }
 }
