@@ -55,13 +55,13 @@ export default function AppealsPage() {
   }
 
   const input: React.CSSProperties = {
-    background: 'var(--color-background-secondary)',
-    border: '0.5px solid var(--color-border-tertiary)',
-    borderRadius: 'var(--border-radius-md)',
+    background: 'var(--adm-bg-secondary)',
+    border: '1px solid var(--adm-border)',
+    borderRadius: 'var(--adm-radius-sm)',
     padding: '0.5rem',
     fontSize: 12,
-    color: 'var(--color-text-primary)',
-    fontFamily: 'var(--font-mono)',
+    color: 'var(--adm-text-primary)',
+    fontFamily: 'var(--adm-font-mono)',
     outline: 'none',
     width: '100%',
     minHeight: '100px',
@@ -70,10 +70,10 @@ export default function AppealsPage() {
 
   const button: React.CSSProperties = {
     border: 'none',
-    borderRadius: 'var(--border-radius-md)',
+    borderRadius: 'var(--adm-radius-sm)',
     padding: '0.4rem 0.875rem',
     fontSize: 12,
-    fontFamily: 'var(--font-mono)',
+    fontFamily: 'var(--adm-font-mono)',
     cursor: 'pointer',
     fontWeight: 500,
   }
@@ -81,23 +81,23 @@ export default function AppealsPage() {
   return (
     <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ marginBottom: '1rem' }}>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>
-          revisión
+        <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-text-tertiary)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>
+          apelaciones
         </div>
-        <div style={{ fontSize: 17, fontWeight: 500, color: 'var(--color-text-primary)' }}>
+        <div style={{ fontSize: 17, fontWeight: 500, color: 'var(--adm-text-primary)' }}>
           Apelaciones pendientes
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '1rem', flex: 1, overflow: 'hidden' }}>
         {/* Left Panel: List */}
-        <div style={{ border: '0.5px solid var(--color-border-tertiary)', borderRadius: 'var(--border-radius-lg)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <div style={{ padding: '0.75rem 1rem', borderBottom: '0.5px solid var(--color-border-tertiary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)' }}>Apelaciones</span>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)' }}>{appeals.length}</span>
+        <div style={{ border: '1px solid var(--adm-border)', borderRadius: 'var(--adm-radius)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--adm-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--adm-text-primary)' }}>Apelaciones</span>
+            <span style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-text-secondary)' }}>{appeals.length}</span>
           </div>
           {appeals.length === 0 ? (
-            <div style={{ padding: '1rem', fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-secondary)' }}>
+            <div style={{ padding: '1rem', fontFamily: 'var(--adm-font-mono)', fontSize: 11, color: 'var(--adm-text-secondary)' }}>
               Sin apelaciones pendientes
             </div>
           ) : (
@@ -112,19 +112,19 @@ export default function AppealsPage() {
                   }}
                   style={{
                     padding: '0.75rem 1rem',
-                    borderBottom: '0.5px solid var(--color-border-tertiary)',
+                    borderBottom: '1px solid var(--adm-border)',
                     cursor: 'pointer',
-                    background: selectedId === appeal.id ? 'var(--color-background-secondary)' : 'transparent',
+                    background: selectedId === appeal.id ? 'var(--adm-bg-secondary)' : 'transparent',
                     transition: 'background 0.15s',
                   }}
                 >
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', marginBottom: 2 }}>
+                  <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-text-secondary)', marginBottom: 2 }}>
                     ID {appeal.id}
                   </div>
-                  <div style={{ fontSize: 11, color: 'var(--color-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div style={{ fontSize: 11, color: 'var(--adm-text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {appeal.message || '(sin mensaje)'}
                   </div>
-                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--color-text-secondary)', marginTop: 3 }}>
+                  <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 9, color: 'var(--adm-text-secondary)', marginTop: 3 }}>
                     {new Date(appeal.createdAt).toLocaleDateString()}
                   </div>
                 </div>
@@ -135,12 +135,12 @@ export default function AppealsPage() {
 
         {/* Right Panel: Detail */}
         {selected ? (
-          <div style={{ border: '0.5px solid var(--color-border-tertiary)', borderRadius: 'var(--border-radius-lg)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            <div style={{ padding: '0.75rem 1rem', borderBottom: '0.5px solid var(--color-border-tertiary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)' }}>
+          <div style={{ border: '1px solid var(--adm-border)', borderRadius: 'var(--adm-radius)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--adm-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--adm-text-primary)' }}>
                 Apelación #{selected.id}
               </span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)' }}>
+              <span style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-text-secondary)' }}>
                 {selected.language}
               </span>
             </div>
@@ -148,19 +148,19 @@ export default function AppealsPage() {
             <div style={{ flex: 1, overflow: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {/* Message Section */}
               <div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-text-secondary)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Mensaje del alumno
                 </div>
                 <div style={{
-                  background: 'var(--color-background-secondary)',
-                  border: '0.5px solid var(--color-border-tertiary)',
-                  borderRadius: 'var(--border-radius-md)',
+                  background: 'var(--adm-bg-secondary)',
+                  border: '1px solid var(--adm-border)',
+                  borderRadius: 'var(--adm-radius-sm)',
                   padding: '0.75rem',
                   fontSize: 12,
-                  color: 'var(--color-text-primary)',
+                  color: 'var(--adm-text-primary)',
                   whiteSpace: 'pre-wrap',
                   wordBreak: 'break-word',
-                  fontFamily: 'var(--font-mono)',
+                  fontFamily: 'var(--adm-font-mono)',
                   minHeight: '60px',
                 }}>
                   {selected.message || '(sin mensaje)'}
@@ -169,19 +169,19 @@ export default function AppealsPage() {
 
               {/* Code Section */}
               <div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-text-secondary)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Código enviado
                 </div>
                 <div style={{
-                  background: 'var(--color-background-secondary)',
-                  border: '0.5px solid var(--color-border-tertiary)',
-                  borderRadius: 'var(--border-radius-md)',
+                  background: 'var(--adm-bg-secondary)',
+                  border: '1px solid var(--adm-border)',
+                  borderRadius: 'var(--adm-radius-sm)',
                   padding: '0.75rem',
                   fontSize: 11,
-                  color: 'var(--color-text-secondary)',
+                  color: 'var(--adm-text-secondary)',
                   whiteSpace: 'pre-wrap',
                   wordBreak: 'break-word',
-                  fontFamily: 'var(--font-mono)',
+                  fontFamily: 'var(--adm-font-mono)',
                   maxHeight: '120px',
                   overflow: 'auto',
                 }}>
@@ -191,19 +191,19 @@ export default function AppealsPage() {
 
               {/* Output Section */}
               <div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-text-secondary)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Output / Error
                 </div>
                 <div style={{
-                  background: 'var(--color-background-secondary)',
-                  border: '0.5px solid var(--color-border-tertiary)',
-                  borderRadius: 'var(--border-radius-md)',
+                  background: 'var(--adm-bg-secondary)',
+                  border: '1px solid var(--adm-border)',
+                  borderRadius: 'var(--adm-radius-sm)',
                   padding: '0.75rem',
                   fontSize: 11,
-                  color: 'var(--color-text-secondary)',
+                  color: 'var(--adm-text-secondary)',
                   whiteSpace: 'pre-wrap',
                   wordBreak: 'break-word',
-                  fontFamily: 'var(--font-mono)',
+                  fontFamily: 'var(--adm-font-mono)',
                   maxHeight: '100px',
                   overflow: 'auto',
                 }}>
@@ -213,7 +213,7 @@ export default function AppealsPage() {
 
               {/* Feedback Section */}
               <div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-text-secondary)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Feedback / Notas
                 </div>
                 <textarea
@@ -222,13 +222,13 @@ export default function AppealsPage() {
                   placeholder="Escribir feedback para el alumno…"
                   style={{
                     ...input,
-                    fontFamily: 'var(--font-mono)',
+                    fontFamily: 'var(--adm-font-mono)',
                   }}
                 />
               </div>
 
               {error && (
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-danger)', padding: '0.5rem', background: 'var(--color-background-danger)', borderRadius: 'var(--border-radius-md)' }}>
+                <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 11, color: 'var(--adm-error)', padding: '0.5rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: 'var(--adm-radius-sm)' }}>
                   {error}
                 </div>
               )}
@@ -241,8 +241,8 @@ export default function AppealsPage() {
                   style={{
                     ...button,
                     flex: 1,
-                    background: 'var(--color-background-success)',
-                    color: 'var(--color-text-success)',
+                    background: 'var(--adm-success)',
+                    color: '#fff',
                   }}
                 >
                   {loading ? '…' : '✓ Aceptar'}
@@ -253,8 +253,8 @@ export default function AppealsPage() {
                   style={{
                     ...button,
                     flex: 1,
-                    background: 'var(--color-background-danger)',
-                    color: 'var(--color-text-danger)',
+                    background: 'var(--adm-error)',
+                    color: '#fff',
                   }}
                 >
                   {loading ? '…' : '✕ Rechazar'}
@@ -264,13 +264,13 @@ export default function AppealsPage() {
           </div>
         ) : (
           <div style={{
-            border: '0.5px solid var(--color-border-tertiary)',
-            borderRadius: 'var(--border-radius-lg)',
+            border: '1px solid var(--adm-border)',
+            borderRadius: 'var(--adm-radius)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'var(--color-text-secondary)',
-            fontFamily: 'var(--font-mono)',
+            color: 'var(--adm-text-secondary)',
+            fontFamily: 'var(--adm-font-mono)',
             fontSize: 12,
           }}>
             Seleccionar una apelación para ver detalles

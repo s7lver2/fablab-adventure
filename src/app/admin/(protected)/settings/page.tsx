@@ -48,9 +48,9 @@ export default function SettingsPage() {
   }
 
   const section = (title: string, children: React.ReactNode) => (
-    <div style={{ border: '0.5px solid var(--color-border-tertiary)', borderRadius: 'var(--border-radius-lg)', overflow: 'hidden', marginBottom: '1rem' }}>
-      <div style={{ padding: '0.75rem 1rem', borderBottom: '0.5px solid var(--color-border-tertiary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--color-text-primary)' }}>{title}</span>
+    <div style={{ border: '1px solid var(--adm-border)', borderRadius: 'var(--adm-radius)', overflow: 'hidden', marginBottom: '1rem' }}>
+      <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--adm-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--adm-text-primary)' }}>{title}</span>
       </div>
       <div style={{ padding: '1rem' }}>
         {children}
@@ -63,10 +63,10 @@ export default function SettingsPage() {
   return (
     <div style={{ padding: '1.25rem', maxWidth: 800 }}>
       <div style={{ marginBottom: '1.5rem' }}>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--color-text-secondary)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>
-          configuración
+        <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 10, color: 'var(--adm-text-tertiary)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 3 }}>
+          ajustes
         </div>
-        <div style={{ fontSize: 17, fontWeight: 500, color: 'var(--color-text-primary)' }}>
+        <div style={{ fontSize: 17, fontWeight: 500, color: 'var(--adm-text-primary)' }}>
           Ajustes de la plataforma
         </div>
       </div>
@@ -74,10 +74,10 @@ export default function SettingsPage() {
       {/* Section 1: Seed Version */}
       {section('Versión de siembra', (
         <div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 8 }}>
+          <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 12, color: 'var(--adm-text-secondary)', marginBottom: 8 }}>
             seed_version
           </div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--color-text-primary)', background: 'var(--color-background-secondary)', padding: '0.5rem 0.75rem', borderRadius: 'var(--border-radius-md)' }}>
+          <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 13, color: 'var(--adm-text-primary)', background: 'var(--adm-bg-secondary)', padding: '0.5rem 0.75rem', borderRadius: 'var(--adm-radius-sm)' }}>
             {data.seedVersion}
           </div>
         </div>
@@ -88,14 +88,14 @@ export default function SettingsPage() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
             <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-text-secondary)', marginBottom: 4 }}>
+              <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 12, color: 'var(--adm-text-secondary)', marginBottom: 4 }}>
                 Estado actual
               </div>
               <div style={{
-                fontFamily: 'var(--font-mono)',
+                fontFamily: 'var(--adm-font-mono)',
                 fontSize: 13,
                 fontWeight: 500,
-                color: maintenance ? '#DC5034' : '#16A34A',
+                color: maintenance ? 'var(--adm-error)' : 'var(--adm-success)',
               }}>
                 {maintenance ? '🟠 ACTIVO — Desactivar' : '🟢 INACTIVO — Activar'}
               </div>
@@ -104,13 +104,13 @@ export default function SettingsPage() {
               onClick={handleToggleMaintenance}
               disabled={saving}
               style={{
-                background: maintenance ? '#16A34A' : '#DC5034',
+                background: maintenance ? 'var(--adm-success)' : 'var(--adm-error)',
                 color: 'white',
                 border: 'none',
-                borderRadius: 'var(--border-radius-md)',
+                borderRadius: 'var(--adm-radius-sm)',
                 padding: '0.5rem 1rem',
                 fontSize: 12,
-                fontFamily: 'var(--font-mono)',
+                fontFamily: 'var(--adm-font-mono)',
                 cursor: saving ? 'not-allowed' : 'pointer',
                 opacity: saving ? 0.6 : 1,
                 fontWeight: 500,
@@ -121,12 +121,12 @@ export default function SettingsPage() {
           </div>
           {message && (
             <div style={{
-              fontFamily: 'var(--font-mono)',
+              fontFamily: 'var(--adm-font-mono)',
               fontSize: 11,
-              color: message.startsWith('Error') ? 'var(--color-text-danger)' : 'var(--color-text-success)',
-              background: message.startsWith('Error') ? 'rgba(220, 80, 52, 0.1)' : 'rgba(22, 163, 74, 0.1)',
+              color: message.startsWith('Error') ? 'var(--adm-error)' : 'var(--adm-success)',
+              background: message.startsWith('Error') ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
               padding: '0.5rem 0.75rem',
-              borderRadius: 'var(--border-radius-md)',
+              borderRadius: 'var(--adm-radius-sm)',
               marginTop: '0.75rem',
             }}>
               {message}
@@ -139,26 +139,26 @@ export default function SettingsPage() {
       {section('Configuración de apelaciones', (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
           <div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 6 }}>
+            <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 11, color: 'var(--adm-text-secondary)', marginBottom: 6 }}>
               Máx. pendientes por reto
             </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 500, color: 'var(--color-text-primary)' }}>
+            <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 16, fontWeight: 500, color: 'var(--adm-text-primary)' }}>
               {data.appeals.maxPendingPerChallenge}
             </div>
           </div>
           <div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 6 }}>
+            <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 11, color: 'var(--adm-text-secondary)', marginBottom: 6 }}>
               Máx. pendientes globales
             </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 500, color: 'var(--color-text-primary)' }}>
+            <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 16, fontWeight: 500, color: 'var(--adm-text-primary)' }}>
               {data.appeals.maxPendingGlobal}
             </div>
           </div>
           <div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 6 }}>
+            <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 11, color: 'var(--adm-text-secondary)', marginBottom: 6 }}>
               Cooldown (horas)
             </div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 16, fontWeight: 500, color: 'var(--color-text-primary)' }}>
+            <div style={{ fontFamily: 'var(--adm-font-mono)', fontSize: 16, fontWeight: 500, color: 'var(--adm-text-primary)' }}>
               {data.appeals.cooldownHours}
             </div>
           </div>
