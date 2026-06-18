@@ -656,3 +656,112 @@ textarea {
   font-weight: 600;
   flex-shrink: 0;
 }
+
+/* ── Admin Theme Token System (Dark Default + Light Override) ─────── */
+
+.admin-shell {
+  /* Primary Colors */
+  --adm-accent: #6366F1;
+  --adm-accent-2-dark: #818CF8;
+  --adm-accent-2-light: #4F46E5;
+
+  /* Backgrounds */
+  --adm-bg-primary: #0f172a;
+  --adm-bg-secondary: #1e293b;
+  --adm-bg-tertiary: #334155;
+
+  /* Text */
+  --adm-text-primary: #f1f5f9;
+  --adm-text-secondary: #cbd5e1;
+  --adm-text-tertiary: #94a3b8;
+
+  /* Borders */
+  --adm-border: #475569;
+  --adm-border-light: #334155;
+
+  /* States */
+  --adm-success: #10b981;
+  --adm-warning: #f59e0b;
+  --adm-error: #ef4444;
+
+  /* Typography */
+  --adm-font-display: Georgia, serif;
+  --adm-font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --adm-font-mono: 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+
+  /* Spacing */
+  --adm-radius: 12px;
+  --adm-radius-sm: 6px;
+
+  color: var(--adm-text-primary);
+  background: var(--adm-bg-primary);
+}
+
+/* Light Theme Override */
+.admin-shell[data-theme="light"] {
+  /* Primary Colors */
+  --adm-accent: #6366F1;
+  --adm-accent-2-dark: #4F46E5;
+  --adm-accent-2-light: #818CF8;
+
+  /* Backgrounds */
+  --adm-bg-primary: #f8fafc;
+  --adm-bg-secondary: #f1f5f9;
+  --adm-bg-tertiary: #e2e8f0;
+
+  /* Text */
+  --adm-text-primary: #1e293b;
+  --adm-text-secondary: #475569;
+  --adm-text-tertiary: #64748b;
+
+  /* Borders */
+  --adm-border: #cbd5e1;
+  --adm-border-light: #e2e8f0;
+
+  color: var(--adm-text-primary);
+  background: var(--adm-bg-primary);
+}
+
+/* Utility Styles for Admin Shell */
+
+.admin-shell a {
+  color: var(--adm-accent);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.admin-shell a:hover {
+  color: var(--adm-accent-2-dark);
+  text-decoration: underline;
+}
+
+.admin-shell input,
+.admin-shell textarea,
+.admin-shell select {
+  background: var(--adm-bg-secondary);
+  color: var(--adm-text-primary);
+  border: 1px solid var(--adm-border);
+  border-radius: var(--adm-radius-sm);
+  padding: 0.65rem 0.85rem;
+  font-family: var(--adm-font-body);
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-shell input:focus,
+.admin-shell textarea:focus,
+.admin-shell select:focus {
+  outline: none;
+  border-color: var(--adm-accent);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.admin-shell textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.admin-shell select {
+  cursor: pointer;
+}
