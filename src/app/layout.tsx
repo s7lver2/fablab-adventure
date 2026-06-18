@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { MaintenanceRedirector } from "@/components/MaintenanceRedirector";
 
@@ -17,6 +18,16 @@ export default function RootLayout({
       <body>
         <MaintenanceRedirector />
         {children}
+        <Script
+          src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"
+          strategy="beforeInteractive"
+          async
+        />
+        <Script
+          src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"
+          strategy="beforeInteractive"
+          async
+        />
       </body>
     </html>
   );

@@ -6,18 +6,22 @@ type SkulptModule = {
   python3: unknown
 }
 
-function getSk(): SkulptModule {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const mod = require('skulpt')
-  return mod.default ?? mod
-}
-
 export function runPython(code: string, input: unknown): RunResult {
   const started = Date.now()
-  const lines: string[] = []
 
   try {
-    const Sk = getSk()
+    // Check if Skulpt is available globally (bundled or loaded)
+    if (typeof globalThis === 'undefined' || !('Sk' in globalThis)) {
+      return {
+        output: '',
+        error: 'Python no está disponible en este navegador. Usa JavaScript en su lugar.',
+        timeMs: Date.now() - started
+      }
+    }
+
+    const Sk = (globalThis as any).Sk as SkulptModule
+    const lines: string[] = []
+
     Sk.configure({
       output: (text: string) => {
         if (text !== '\n') lines.push(text.replace(/\n$/, ''))

@@ -7,5 +7,6 @@ interface WorkerRequest {
 
 self.onmessage = (e: MessageEvent<WorkerRequest>) => {
   const { code, input } = e.data
-  self.postMessage(runPython(code, input))
+  const result = runPython(code, input)
+  self.postMessage(result)
 }
