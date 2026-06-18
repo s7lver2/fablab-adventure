@@ -36,6 +36,13 @@ yarn-error.log*
 # vercel
 .vercel
 
+# sqlite write-ahead-log / shared-memory (temporales, regenerados en runtime)
+data.sqlite-shm
+data.sqlite-wal
+
+# agent local config
+.claude/launch.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
