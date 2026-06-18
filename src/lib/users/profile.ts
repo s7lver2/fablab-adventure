@@ -2,7 +2,7 @@ import type { ProfileUpdate } from './types'
 import { isPresetId } from './banners'
 
 export const MAX_PROFILE_MESSAGE = 100
-export const MAX_BANNER_IMAGE_SIZE = 500 * 1024 // 500 KB
+export const MAX_BANNER_IMAGE_CHARS = 700_000 // ~500 KB base64
 
 export type ValidationResult = { ok: true } | { ok: false; error: string }
 
@@ -17,8 +17,8 @@ export function validateProfileUpdate(update: ProfileUpdate): ValidationResult {
     return { ok: false, error: `El mensaje no puede superar los ${MAX_PROFILE_MESSAGE} caracteres.` }
   }
 
-  // Validate banner
-  if (update.banner && !update.banner.startsWith('preset:') && update.banner !== 'upload') {
+  // Validate banner token
+  if (update.banner !== '' && update.banner !== 'upload' && !update.banner.startsWith('preset:')) {
     return { ok: false, error: 'Banner inválido.' }
   }
   if (update.banner.startsWith('preset:')) {
@@ -28,17 +28,16 @@ export function validateProfileUpdate(update: ProfileUpdate): ValidationResult {
     }
   }
 
-  // Validate banner image
-  if (update.bannerImage) {
-    if (!update.bannerImage.startsWith('data:image/')) {
-      return { ok: false, error: 'La imagen del banner debe ser en formato base64.' }
+  // Validate banner image when banner is 'upload'
+  if (update.banner === 'upload') {
+    if (!update.bannerImage) {
+      return { ok: false, error: 'Se requiere una imagen para el banner de carga.' }
     }
-    const sizeEstimate = (update.bannerImage.length * 3) / 4
-    if (sizeEstimate > MAX_BANNER_IMAGE_SIZE) {
-      return { ok: false, error: `La imagen del banner no puede superar ${MAX_BANNER_IMAGE_SIZE / 1024} KB.` }
+    if (!update.bannerImage.match(/^data:image\/(png|jpe?g|webp|gif);base64,/)) {
+      return { ok: false, error: 'La imagen del banner debe ser PNG, JPEG, WebP o GIF en formato base64.' }
     }
-    if (!/(png|jpeg|webp|gif)/.test(update.bannerImage)) {
-      return { ok: false, error: 'La imagen del banner debe ser PNG, JPEG, WebP o GIF.' }
+    if (update.bannerImage.length > MAX_BANNER_IMAGE_CHARS) {
+      return { ok: false, error: `La imagen del banner no puede superar ${MAX_BANNER_IMAGE_CHARS} caracteres.` }
     }
   }
 

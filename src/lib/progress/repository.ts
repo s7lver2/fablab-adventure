@@ -16,6 +16,12 @@ export interface AttemptResult {
   completed: boolean
 }
 
+export interface RecentCompletedLesson {
+  challengeId: number
+  stars: number
+  completedAt: number
+}
+
 export class ProgressRepository {
   constructor(private db: Database.Database) {}
 
@@ -70,5 +76,18 @@ export class ProgressRepository {
       .prepare("SELECT challenge_id FROM progress WHERE user_id = ? AND status = 'completed'")
       .all(userId) as { challenge_id: number }[]
     return rows.map((r) => r.challenge_id)
+  }
+
+  recentCompleted(userId: number, limit: number): RecentCompletedLesson[] {
+    const rows = this.db
+      .prepare(
+        "SELECT challenge_id, stars, completed_at FROM progress WHERE user_id = ? AND status = 'completed' AND completed_at IS NOT NULL ORDER BY completed_at DESC LIMIT ?",
+      )
+      .all(userId, limit) as { challenge_id: number; stars: number; completed_at: number }[]
+    return rows.map((r) => ({
+      challengeId: r.challenge_id,
+      stars: r.stars,
+      completedAt: r.completed_at,
+    }))
   }
 }

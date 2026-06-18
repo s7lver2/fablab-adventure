@@ -29,11 +29,19 @@ describe('UserRepository', () => {
   it('actualiza el perfil', () => {
     const repo = freshRepo()
     const user = repo.findOrCreateByUsername('ana')
-    repo.updateProfile(user.id, { displayName: 'Ana G.', avatar: 'cat', profileMessage: 'hola' })
+    repo.updateProfile(user.id, {
+      displayName: 'Ana G.',
+      avatar: 'cat',
+      profileMessage: 'hola',
+      banner: 'preset:sunset',
+      bannerImage: null,
+    })
     const updated = repo.findById(user.id)!
     expect(updated.displayName).toBe('Ana G.')
     expect(updated.avatar).toBe('cat')
     expect(updated.profileMessage).toBe('hola')
+    expect(updated.banner).toBe('preset:sunset')
+    expect(updated.bannerImage).toBe(null)
   })
 
   it('no permite registrarse con el username reservado root', () => {
