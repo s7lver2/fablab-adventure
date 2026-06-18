@@ -14,7 +14,8 @@ export async function GET() {
   const user = await getCurrentUser(new UserRepository(db))
   if (!isAdmin(user)) return NextResponse.json({ error: 'No autorizado.' }, { status: 403 })
 
-  const events = new EventLogger(db).listAll()
+  const logger = new EventLogger(db)
+  const events = logger.listAll()
   const summary = summarize(events)
 
   // Dispositivos y navegadores (agrupados)
@@ -44,5 +45,6 @@ export async function GET() {
     devices: Object.fromEntries(deviceMap),
     browsers: Object.fromEntries(browserMap),
     stuck: stuck.map((s) => ({ ...s, challengeTitle: titleById[s.challengeId] ?? '' })),
+    byDayHour: logger.byDayHour(),
   })
 }
