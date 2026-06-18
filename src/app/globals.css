@@ -1205,3 +1205,33 @@ textarea {
     transition: none;
   }
 }
+
+/* Blockly customizations for zelos renderer and warm palette */
+.blockly-wrap .blocklyFlyout {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.blockly-wrap .blocklyTrash {
+  border-radius: 50%;
+  background: #fbf8f2;
+  border: 2px solid #f59e0b;
+}
+
+.blockly-wrap .blocklyToolboxDiv {
+  font-family: var(--font-sans);
+}
+
+.blockly-wrap .blocklyCategory {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* Ensure reduced-motion is respected in Blockly animations */
+@media (prefers-reduced-motion: reduce) {
+  .blockly-wrap * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
