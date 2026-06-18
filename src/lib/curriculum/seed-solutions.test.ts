@@ -32,6 +32,7 @@ const SOLUTIONS: Record<string, string> = {
   saludo: 'print("Hola mundo")',
   'varias-lineas': 'print("Hola")\nprint("me llamo Robot")\nprint("adiós")',
   'si-o-no': 'if (input.edad >= 18) {\n  print("mayor")\n} else {\n  print("menor")\n}',
+  calculadora: 'if (input.op === "+") {\n  print(input.a + input.b)\n} else if (input.op === "-") {\n  print(input.a - input.b)\n} else {\n  print(input.a * input.b)\n}',
 }
 
 function seededRepo() {

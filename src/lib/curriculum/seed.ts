@@ -251,4 +251,14 @@ function seedAll(db: Database.Database): void {
   tc(db, r16, { n: 10 }, 'no primo', 1)
   tc(db, r16, { n: 2 }, 'primo', 2)
   tc(db, r16, { n: 1 }, 'no primo', 3)
+
+  // ── Proyectos (proyectos, ord 6) ────────────────────────────────────────────
+
+  const p1 = challenge(db, proyectos, 'calculadora', 'Calculadora', 'Es hora de tu primer mini-proyecto: una calculadora que suma, resta o multiplica dos números según lo que pidas. Recibirás input.a (primer número), input.op (la operación: "+", "-" o "*") e input.b (segundo número). Tu trabajo: mostrar el resultado de aplicar la operación.', 0)
+  variant(db, p1, 'js', 'Reto experto 🧠 Lee input.a, input.op e input.b. Si op es "+", suma; si es "-", resta; si es "*", multiplica. Muestra el resultado.\n\n👉 Encadena if / else if / else para los tres casos. Cada rama calcula la operación correspondiente.', 'if (input.op === "+") {\n  print(input.a + input.b)\n} else if (input.op === "-") {\n  print(input.a - input.b)\n} else {\n  print(input.a * input.b)\n}', ['Lee los tres datos: input.a (número), input.op (operación), input.b (número).', 'Compara input.op con "+", "-" y "*" usando === (igualdad exacta).', 'En cada rama, calcula la operación correspondiente y muéstrala con print(...).'])
+  variant(db, p1, 'python', 'Reto experto 🧠 Lee input["a"], input["op"] e input["b"]. Si op es "+", suma; si es "-", resta; si es "*", multiplica. Muestra el resultado.\n\n👉 Encadena if / elif / else para los tres casos. Cada rama calcula la operación correspondiente.', 'a = input["a"]\nop = input["op"]\nb = input["b"]\nif op == "+":\n    print(a + b)\nelif op == "-":\n    print(a - b)\nelse:\n    print(a * b)', ['Lee los tres datos: input["a"] (número), input["op"] (operación), input["b"] (número).', 'Compara input["op"] con "+", "-" y "*" usando == (igualdad).', 'En cada rama, calcula la operación correspondiente y muéstrala con print(...).'])
+  variant(db, p1, 'blocks', 'Reto experto 🧠 Lee input.a, input.op e input.b. Si op es "+", suma; si es "-", resta; si es "*", multiplica. Muestra el resultado.\n\n🧩 Tres datos: «dato a», «dato op» y «dato b» de la categoría rosa «Datos». Un bloque «si … si no» de «Lógica» con tres ramas (añade dos con la ruedita ⚙️). Cada rama compara «op» con un operador y calcula el resultado.', '', ['Coge tres bloques de «Datos»: «dato a», «dato op» y «dato b».', 'En «Lógica» usa el bloque de comparación «texto = texto» para comparar el operador: primero con "+", luego con "-".', 'Mete las comparaciones en el «si … si no» (con ruedita ⚙️ añade dos ramas). En cada rama, calcula y muestra el resultado con «imprimir» y un bloque de operación de «Matemáticas».', 'La última rama (sin condición) es para "*": directamente multiplica y muestra.'])
+  tc(db, p1, { a: 6, op: '+', b: 4 }, '10', 0)
+  tc(db, p1, { a: 6, op: '-', b: 4 }, '2', 1)
+  tc(db, p1, { a: 6, op: '*', b: 4 }, '24', 2)
 }
