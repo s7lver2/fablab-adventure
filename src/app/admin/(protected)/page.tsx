@@ -103,7 +103,8 @@ export default function AdminOverviewPage() {
         plugins: { legend: { display: false } },
         scales: { x: scale, y: scale },
       },
-    }, [glowPlugin])
+      plugins: [glowPlugin],
+    })
 
     langChart.current = new Chart(langRef.current.getContext('2d')!, {
       type: 'doughnut',
@@ -134,7 +135,8 @@ export default function AdminOverviewPage() {
           },
         },
       },
-    }, [centerTextPlugin('100%', 'ALUMNOS')])
+      plugins: [centerTextPlugin('100%', 'ALUMNOS')],
+    })
 
     const handleThemeChange = () => {
       if (!analytics || !actRef.current || !langRef.current) return
@@ -173,7 +175,8 @@ export default function AdminOverviewPage() {
           plugins: { legend: { display: false } },
           scales: { x: newScale, y: newScale },
         },
-      }, [glowPlugin])
+        plugins: [glowPlugin],
+      })
 
       langChart.current = new Chart(langRef.current.getContext('2d')!, {
         type: 'doughnut',
@@ -204,7 +207,8 @@ export default function AdminOverviewPage() {
             },
           },
         },
-      }, [centerTextPlugin('100%', 'ALUMNOS')])
+        plugins: [centerTextPlugin('100%', 'ALUMNOS')],
+      })
     }
 
     window.addEventListener('adm-theme-change', handleThemeChange)

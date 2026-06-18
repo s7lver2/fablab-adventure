@@ -75,7 +75,8 @@ export default function GeoPage() {
         datasets: [{ data: topCities.map((c) => c.count), backgroundColor: INDIGO_RAMP.concat(INDIGO_RAMP).slice(0, topCities.length), borderWidth: 0, hoverOffset: 6 }],
       },
       options: { animation: { ...chartAnim(), animateRotate: true }, cutout: '68%', plugins: { legend: { position: 'right' as const } } },
-    }, [centerTextPlugin(String(totalCities), 'CIUDADES')])
+      plugins: [centerTextPlugin(String(totalCities), 'CIUDADES')],
+    })
 
     return () => { countriesChart.current?.destroy(); citiesChart.current?.destroy() }
   }, [data])
@@ -113,7 +114,8 @@ export default function GeoPage() {
               datasets: [{ data: topCities.map((c) => c.count), backgroundColor: INDIGO_RAMP.concat(INDIGO_RAMP).slice(0, topCities.length), borderWidth: 0, hoverOffset: 6 }],
             },
             options: { animation: { ...chartAnim(), animateRotate: true }, cutout: '68%', plugins: { legend: { position: 'right' as const } } },
-          }, [centerTextPlugin(String(totalCities), 'CIUDADES')])
+            plugins: [centerTextPlugin(String(totalCities), 'CIUDADES')],
+          })
         }
       }
     }

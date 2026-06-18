@@ -5,12 +5,13 @@ const TIMEOUT_MS = 5000
 
 export function runInWorker(code: string, input: unknown, language: Language = 'js'): Promise<RunResult> {
   return new Promise((resolve) => {
-    const workerUrl =
+    // El patrón `new Worker(new URL('./archivo', import.meta.url))` debe ir INLINE:
+    // así Turbopack lo compila como worker. Si la URL se guarda en una variable, el
+    // bundler la trata como asset estático y sirve el .ts crudo → "error al cargar el worker".
+    const worker =
       language === 'python'
-        ? new URL('./python-worker.ts', import.meta.url)
-        : new URL('./worker.ts', import.meta.url)
-
-    const worker = new Worker(workerUrl)
+        ? new Worker(new URL('./python-worker.ts', import.meta.url), { type: 'module' })
+        : new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' })
     const timer = setTimeout(() => {
       worker.terminate()
       resolve({
