@@ -104,17 +104,10 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
         )}
       </header>
 
-      <div className="challenge-split">
-        <div className="panel panel--code">
-          <div className="panel__section">
-            <p className="panel__heading">📋 Misión</p>
-            <p style={{ marginTop: '0.4rem' }}>{data.narrative}</p>
-            <p style={{ marginTop: '0.5rem', fontWeight: 700, color: 'var(--text)' }}>
-              {data.variant.statement}
-            </p>
-          </div>
-
-          <div className="panel__section panel__section--grow">
+      <div className="challenge-grid">
+        {/* LEFT: Code Editor */}
+        <div className="challenge-left">
+          <div className="panel" style={{ flex: 1, minHeight: 0 }}>
             <p className="panel__heading">✏️ Tu código</p>
             {isBlocks ? (
               <BlocklyEditor onCodeChange={handleCodeChange} />
@@ -128,56 +121,65 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
                 autoCorrect="off"
               />
             )}
-          </div>
-
-          <div className="panel__actions">
-            <button onClick={run} disabled={running} className="btn">
-              {running ? 'Ejecutando…' : '▶ Ejecutar'}
-            </button>
-            {hasHints && (
-              <button onClick={showHint} disabled={running} className="btn btn-secondary">
-                💡 Pista
+            <div className="panel__actions" style={{ gap: '0.75rem' }}>
+              <button onClick={run} disabled={running} className="btn" style={{ flex: 1 }}>
+                {running ? 'Ejecutando…' : '▶ Ejecutar'}
               </button>
-            )}
+              {hasHints && (
+                <button onClick={showHint} disabled={running} className="btn btn-secondary">
+                  💡 Pista
+                </button>
+              )}
+            </div>
+            {hintText && <p className="hint-box">{hintText}</p>}
           </div>
-
-          {hintText && <p className="hint-box">{hintText}</p>}
         </div>
 
-        <div className="panel panel--viewport">
-          <div className="panel__section">
-            <p className="panel__heading">▶ Salida</p>
+        {/* RIGHT: Lesson Top + Console Bottom */}
+        <div className="challenge-right">
+          {/* RIGHT-TOP: Lesson Card */}
+          <div className="challenge-lesson">
+            <p className="panel__heading">📖 La lección</p>
+            <p style={{ marginTop: '0.4rem', fontSize: '0.95rem' }}>{data.narrative}</p>
+            <p style={{ marginTop: '0.75rem', fontWeight: 700, color: 'var(--text)', fontSize: '1rem' }}>
+              {data.variant.statement}
+            </p>
+          </div>
+
+          {/* RIGHT-BOTTOM: Console Card */}
+          <div className="challenge-console">
+            <p className="panel__heading">▶ Consola · resultado</p>
             <pre className="console-out">
               {consoleOut || <span style={{ opacity: 0.4 }}>Aquí verás el resultado…</span>}
             </pre>
-          </div>
 
-          {data.inputs.length > 0 && (
-            <div className="panel__section">
-              <p className="panel__heading">🧪 Casos de prueba</p>
-              <ul className="test-list">
-                {data.inputs.map((_, i) => (
-                  <li key={i} className="test-item">
-                    <span className="test-item__icon">{submitted ? (score?.correct ? '✅' : '❌') : '⬜'}</span>
-                    <span className="test-item__label">Caso {i + 1}</span>
-                  </li>
-                ))}
-              </ul>
+            {data.inputs.length > 0 && (
+              <div style={{ marginTop: '1rem' }}>
+                <p className="panel__heading" style={{ fontSize: '0.9rem' }}>🧪 Casos de prueba</p>
+                <ul className="test-list">
+                  {data.inputs.map((_, i) => (
+                    <li key={i} className="test-item">
+                      <span className="test-item__icon">{submitted ? (score?.correct ? '✅' : '❌') : '⬜'}</span>
+                      <span className="test-item__label">Caso {i + 1}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {score && (
+              <div className={`result-banner ${score.correct ? 'result-banner--ok' : 'result-banner--fail'}`}>
+                {score.correct
+                  ? `🎉 ¡Correcto! ${'★'.repeat(score.stars)}`
+                  : '❌ Aún no es correcto. ¡Sigue intentando!'}
+              </div>
+            )}
+
+            <div className="panel__actions" style={{ marginTop: '1rem' }}>
+              <button onClick={submit} disabled={running} className="btn" style={{ flex: 1 }}>
+                {running ? 'Comprobando…' : '🚀 Enviar solución'}
+              </button>
             </div>
-          )}
-
-          {score && (
-            <div className={`result-banner ${score.correct ? 'result-banner--ok' : 'result-banner--fail'}`}>
-              {score.correct
-                ? `🎉 ¡Correcto! ${'★'.repeat(score.stars)}`
-                : '❌ Aún no es correcto. ¡Sigue intentando!'}
-            </div>
-          )}
-
-          <div className="panel__actions panel__actions--submit">
-            <button onClick={submit} disabled={running} className="btn" style={{ flex: 1 }}>
-              {running ? 'Comprobando…' : '🚀 Enviar solución'}
-            </button>
           </div>
         </div>
       </div>

@@ -510,6 +510,76 @@ textarea {
   text-overflow: ellipsis;
 }
 
+/* New 3-zone layout: left code, right-top lesson, right-bottom console */
+.challenge-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 0.75rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.challenge-left {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.challenge-right {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 0.75rem;
+}
+
+.challenge-lesson {
+  background: var(--card);
+  border: 3px solid var(--violet);
+  border-radius: var(--radius);
+  box-shadow: 0 5px 0 var(--violet-dark);
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.challenge-console {
+  background: var(--card);
+  border: 3px solid var(--amber);
+  border-radius: var(--radius);
+  box-shadow: 0 5px 0 var(--amber-dark);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.challenge-left .panel {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Responsive: stack to one column on narrow screens */
+@media (max-width: 800px) {
+  .challenge-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+  .challenge-left {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .challenge-right {
+    grid-column: 1;
+    grid-row: 2 / 4;
+  }
+}
+
+/* Keep old challenge-split for backward compat (shouldn't be used) */
 .challenge-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
