@@ -4,7 +4,7 @@ import { getDb } from '@/lib/db/connection'
 import { UserRepository } from '@/lib/users/repository'
 import { CurriculumRepository } from '@/lib/curriculum/repository'
 import { ProgressRepository } from '@/lib/progress/repository'
-import { getCurrentUser } from '@/lib/session/server'
+import { getCurrentUser, getChosenLanguage } from '@/lib/session/server'
 import { nextChallengeSlug } from '@/lib/progress/next'
 import { TopNav } from '@/components/TopNav'
 import { StatCard } from '@/components/StatCard'
@@ -20,7 +20,8 @@ export default async function DashboardPage() {
   const db = getDb()
   const user = await getCurrentUser(new UserRepository(db))
   if (!user) redirect('/login')
-  if (!user.chosenLanguage) redirect('/onboarding')
+  const chosenLanguage = await getChosenLanguage(user.chosenLanguage)
+  if (!chosenLanguage) redirect('/onboarding')
 
   const curriculum = new CurriculumRepository(db)
   const progress = new ProgressRepository(db)
@@ -49,7 +50,7 @@ export default async function DashboardPage() {
           <div>
             <h1>{'¡Hola, ' + user.displayName + '!'}</h1>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)', fontWeight: 700 }}>
-              {user.chosenLanguage ? LANG_LABEL[user.chosenLanguage] : ''}
+              {chosenLanguage ? LANG_LABEL[chosenLanguage] : ''}
             </span>
           </div>
         </div>

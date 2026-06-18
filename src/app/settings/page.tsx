@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getDb } from '@/lib/db/connection'
 import { UserRepository } from '@/lib/users/repository'
-import { getCurrentUser } from '@/lib/session/server'
+import { getCurrentUser, getChosenLanguage } from '@/lib/session/server'
 import { SettingsClient } from './SettingsClient'
 import { TopNav } from '@/components/TopNav'
 
@@ -10,6 +10,7 @@ export default async function SettingsPage() {
   const db = getDb()
   const user = await getCurrentUser(new UserRepository(db))
   if (!user) redirect('/login')
+  const chosenLanguage = await getChosenLanguage(user.chosenLanguage)
 
   return (
     <>
@@ -22,7 +23,7 @@ export default async function SettingsPage() {
         <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem', marginBottom: '2rem' }}>
           Ajusta tu experiencia de aprendizaje
         </p>
-        <SettingsClient currentLanguage={user.chosenLanguage ?? null} />
+        <SettingsClient currentLanguage={chosenLanguage ?? null} />
       </main>
     </>
   )
