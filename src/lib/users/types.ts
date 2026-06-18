@@ -8,6 +8,8 @@ export interface User {
   displayName: string
   avatar: string
   profileMessage: string
+  banner: string
+  bannerImage: string | null
   role: Role
   hidden: boolean
   createdAt: number
@@ -19,4 +21,6 @@ export interface ProfileUpdate {
   displayName: string
   avatar: string
   profileMessage: string
+  banner: string
+  bannerImage: string | null
 }

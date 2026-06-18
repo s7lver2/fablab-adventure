@@ -9,6 +9,8 @@ interface UserRow {
   display_name: string
   avatar: string
   profile_message: string
+  banner: string
+  banner_image?: string | null
   role: Role
   hidden: number
   created_at: number
@@ -23,6 +25,8 @@ function toUser(row: UserRow): User {
     displayName: row.display_name,
     avatar: row.avatar,
     profileMessage: row.profile_message,
+    banner: row.banner,
+    bannerImage: row.banner_image ?? null,
     role: row.role,
     hidden: row.hidden === 1,
     createdAt: row.created_at,
@@ -69,9 +73,9 @@ export class UserRepository {
   updateProfile(id: number, update: ProfileUpdate): void {
     this.db
       .prepare(
-        'UPDATE users SET display_name = ?, avatar = ?, profile_message = ? WHERE id = ? AND role = (SELECT role FROM users WHERE id = ?)',
+        'UPDATE users SET display_name = ?, avatar = ?, profile_message = ?, banner = ?, banner_image = ? WHERE id = ? AND role = (SELECT role FROM users WHERE id = ?)',
       )
-      .run(update.displayName, update.avatar, update.profileMessage, id, id)
+      .run(update.displayName, update.avatar, update.profileMessage, update.banner, update.bannerImage, id, id)
   }
 
   verifyPassword(username: string, plain: string): boolean {

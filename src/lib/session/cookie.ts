@@ -46,6 +46,8 @@ export function resolveUserFromCookie(db: Database.Database, token: string): Use
     displayName: row.display_name,
     avatar: row.avatar || '',
     profileMessage: row.profile_message || '',
+    banner: row.banner || '',
+    bannerImage: row.banner_image ?? null,
     role: row.role,
     hidden: row.hidden,
     createdAt: row.created_at,

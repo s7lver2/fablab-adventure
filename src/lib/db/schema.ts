@@ -109,6 +109,18 @@ export function createSchema(db: Database.Database): void {
     // columna ya existe
   }
 
+  // Migración idempotente: añadir banner fields a users
+  try {
+    db.exec("ALTER TABLE users ADD COLUMN banner TEXT NOT NULL DEFAULT ''")
+  } catch {
+    // columna ya existe
+  }
+  try {
+    db.exec("ALTER TABLE users ADD COLUMN banner_image TEXT")
+  } catch {
+    // columna ya existe
+  }
+
   seedRoot(db)
 }
 
