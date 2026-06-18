@@ -35,72 +35,41 @@ export default function AnalyticsPage() {
   }, [])
 
   useEffect(() => {
-    if (!data || !hourlyRef.current || !conceptsRef.current) return
-    hourlyChart.current?.destroy()
-    conceptsChart.current?.destroy()
-
-    const theme = chartTheme()
-    const scale = { grid: { color: theme.gridColor }, border: { display: false as const }, ticks: { color: theme.textColor, font: { family: 'monospace', size: 10 } } }
-
-    hourlyChart.current = new Chart(hourlyRef.current.getContext('2d')!, {
-      type: 'bar',
-      data: {
-        labels: Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0')),
-        datasets: [{ data: data.summary.byHour, backgroundColor: INDIGO, borderRadius: 4, borderWidth: 0 }],
-      },
-      options: { animation: chartAnim(), plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
-    })
-
-    conceptsChart.current = new Chart(conceptsRef.current.getContext('2d')!, {
-      type: 'bar',
-      data: {
-        labels: ['Fundamentos', 'Condicionales', 'Bucles', 'Funciones'],
-        datasets: [{ data: [5, 4, 4, 3], backgroundColor: INDIGO_RAMP.slice(0, 4), borderRadius: 4, borderWidth: 0 }],
-      },
-      options: { animation: chartAnim(), indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
-    })
-
-    return () => { hourlyChart.current?.destroy(); conceptsChart.current?.destroy() }
-  }, [data])
-
-  // Listen for theme change events to reinitialize charts
-  useEffect(() => {
-    const handleThemeChange = () => {
+    function buildCharts() {
+      if (!data || !hourlyRef.current || !conceptsRef.current) return
       hourlyChart.current?.destroy()
       conceptsChart.current?.destroy()
-      hourlyChart.current = null
-      conceptsChart.current = null
-      // Trigger chart reinitialization
-      if (data) {
-        const theme = chartTheme()
-        const scale = { grid: { color: theme.gridColor }, border: { display: false as const }, ticks: { color: theme.textColor, font: { family: 'monospace', size: 10 } } }
 
-        if (hourlyRef.current) {
-          hourlyChart.current = new Chart(hourlyRef.current.getContext('2d')!, {
-            type: 'bar',
-            data: {
-              labels: Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0')),
-              datasets: [{ data: data.summary.byHour, backgroundColor: INDIGO, borderRadius: 4, borderWidth: 0 }],
-            },
-            options: { animation: chartAnim(), plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
-          })
-        }
+      const theme = chartTheme()
+      const scale = { grid: { color: theme.gridColor }, border: { display: false as const }, ticks: { color: theme.textColor, font: { family: 'monospace', size: 10 } } }
+      const base = { responsive: true, maintainAspectRatio: false, animation: chartAnim() }
 
-        if (conceptsRef.current) {
-          conceptsChart.current = new Chart(conceptsRef.current.getContext('2d')!, {
-            type: 'bar',
-            data: {
-              labels: ['Fundamentos', 'Condicionales', 'Bucles', 'Funciones'],
-              datasets: [{ data: [5, 4, 4, 3], backgroundColor: INDIGO_RAMP.slice(0, 4), borderRadius: 4, borderWidth: 0 }],
-            },
-            options: { animation: chartAnim(), indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
-          })
-        }
-      }
+      hourlyChart.current = new Chart(hourlyRef.current.getContext('2d')!, {
+        type: 'bar',
+        data: {
+          labels: Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0')),
+          datasets: [{ data: data.summary.byHour, backgroundColor: INDIGO, borderRadius: 4, borderWidth: 0 }],
+        },
+        options: { ...base, plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
+      })
+
+      conceptsChart.current = new Chart(conceptsRef.current.getContext('2d')!, {
+        type: 'bar',
+        data: {
+          labels: ['Fundamentos', 'Condicionales', 'Bucles', 'Funciones'],
+          datasets: [{ data: [5, 4, 4, 3], backgroundColor: INDIGO_RAMP.slice(0, 4), borderRadius: 4, borderWidth: 0 }],
+        },
+        options: { ...base, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: scale, y: scale } },
+      })
     }
 
-    window.addEventListener('adm-theme-change', handleThemeChange)
-    return () => window.removeEventListener('adm-theme-change', handleThemeChange)
+    buildCharts()
+    window.addEventListener('adm-theme-change', buildCharts)
+    return () => {
+      window.removeEventListener('adm-theme-change', buildCharts)
+      hourlyChart.current?.destroy()
+      conceptsChart.current?.destroy()
+    }
   }, [data])
 
   if (!data) return <div style={{ padding: '1.25rem', fontFamily: 'var(--adm-font-mono)', fontSize: 12, color: 'var(--adm-text-secondary)' }}>Cargando…</div>
@@ -130,7 +99,7 @@ export default function AnalyticsPage() {
       </div>
 
       <div style={{ marginBottom: 8 }}>
-        {sec(<>{sh('Actividad por hora del día (UTC)', 'hoy')}<div style={{ padding: '0.75rem' }}><canvas ref={hourlyRef} height={130}></canvas></div></>)}
+        {sec(<>{sh('Actividad por hora del día (UTC)', 'hoy')}<div style={{ padding: '0.75rem' }}><div style={{ position: 'relative', height: 175 }}><canvas ref={hourlyRef}></canvas></div></div></>)}
       </div>
 
       <div style={{ marginBottom: 8 }}>
@@ -146,7 +115,7 @@ export default function AnalyticsPage() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
-        {sec(<>{sh('Retos por concepto', '')}<div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0.75rem 1rem', borderBottom: '1px solid var(--adm-border)' }}><DemoBadge /></div><div style={{ padding: '0.75rem' }}><canvas ref={conceptsRef} height={140}></canvas></div></>)}
+        {sec(<>{sh('Retos por concepto', '')}<div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0.75rem 1rem', borderBottom: '1px solid var(--adm-border)' }}><DemoBadge /></div><div style={{ padding: '0.75rem' }}><div style={{ position: 'relative', height: 175 }}><canvas ref={conceptsRef}></canvas></div></div></>)}
         {sec(<>
           {sh('Dónde se atascan')}
           {data.stuck.length === 0 && <div style={{ padding: '0.75rem 1rem', fontFamily: 'var(--adm-font-mono)', fontSize: 11, color: 'var(--adm-text-secondary)' }}>Sin datos de progreso aún</div>}

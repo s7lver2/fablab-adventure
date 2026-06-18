@@ -76,8 +76,15 @@ export function BlocklyEditor({ onCodeChange }: { onCodeChange: (code: string) =
 
     const update = () => onCodeChange(javascriptGenerator.workspaceToCode(workspace))
     workspace.addChangeListener(update)
-    return () => workspace.dispose()
+
+    const ro = new ResizeObserver(() => Blockly.svgResize(workspace))
+    ro.observe(ref.current)
+
+    return () => {
+      ro.disconnect()
+      workspace.dispose()
+    }
   }, [onCodeChange])
 
-  return <div ref={ref} className="blockly-wrap" style={{ height: 360, width: '100%' }} />
+  return <div ref={ref} className="blockly-wrap" style={{ width: '100%' }} />
 }

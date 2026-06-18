@@ -67,10 +67,7 @@ export const TOOLBOX: Toolbox = {
       kind: 'category',
       name: 'Variables',
       categorystyle: 'variable_category',
-      contents: [
-        { kind: 'block', type: 'variables_get' },
-        { kind: 'block', type: 'variables_set' },
-      ],
+      custom: 'VARIABLE',
     },
     {
       kind: 'category',

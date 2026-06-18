@@ -3,6 +3,7 @@ import { useEffect, useState, use, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { runInWorker, runInteractive, type InteractiveController } from '@/lib/engine/client'
 import { BlocklyEditor } from './BlocklyEditor'
+import { CodeEditor } from './CodeEditor'
 import type { Language } from '@/lib/curriculum/types'
 
 interface ChallengeData {
@@ -152,7 +153,7 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
   return (
     <div className="challenge-page">
       <header className="challenge-topbar">
-        <Link href="/" className="challenge-topbar__back">← Volver</Link>
+        <Link href="/dashboard" className="challenge-topbar__back">← Volver</Link>
         <h1 className="challenge-topbar__title">{data.title}</h1>
         {score && (
           <span className="chip" style={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
@@ -165,17 +166,14 @@ export default function ChallengePage({ params }: { params: Promise<{ slug: stri
         {/* LEFT: Code Editor */}
         <div className="challenge-left">
           <div className="panel" style={{ flex: 1, minHeight: 0 }}>
-            <p className="panel__heading">✏️ Tu código</p>
             {isBlocks ? (
               <BlocklyEditor onCodeChange={handleCodeChange} />
             ) : (
-              <textarea
-                className="code-editor"
+              <CodeEditor
+                key={`${data.slug}-${data.language}`}
                 value={code}
-                onChange={(e) => setCode(e.target.value)}
-                spellCheck={false}
-                autoCapitalize="none"
-                autoCorrect="off"
+                onChange={handleCodeChange}
+                language={data.language === 'python' ? 'python' : 'js'}
               />
             )}
             <div className="panel__actions" style={{ gap: '0.75rem' }}>

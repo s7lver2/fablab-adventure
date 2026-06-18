@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 import Chart from 'chart.js/auto'
 import { chartAnim, INDIGO, centerTextPlugin } from './adminUi'
 
-export function Gauge({ value, label }: { value: number; label: string }) {
+export function Gauge({ value, label, height = 150 }: { value: number; label: string; height?: number }) {
   const ref = useRef<HTMLCanvasElement>(null)
   const chart = useRef<Chart | null>(null)
   useEffect(() => {
@@ -18,5 +18,5 @@ export function Gauge({ value, label }: { value: number; label: string }) {
     })
     return () => chart.current?.destroy()
   }, [value, label])
-  return <div style={{ position: 'relative', height: 150 }}><canvas ref={ref} role="img" aria-label={`${label}: ${Math.round(value)}%`} /></div>
+  return <div style={{ position: 'relative', height }}><canvas ref={ref} role="img" aria-label={`${label}: ${Math.round(value)}%`} /></div>
 }

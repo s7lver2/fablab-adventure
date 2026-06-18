@@ -1,6 +1,6 @@
 import type Database from 'better-sqlite3'
 
-const SEED_VERSION = 6
+const SEED_VERSION = 8
 
 export function seedCurriculum(db: Database.Database): void {
   const versionRow = db.prepare("SELECT value FROM settings WHERE key = 'seed_version'").get() as
@@ -8,10 +8,12 @@ export function seedCurriculum(db: Database.Database): void {
     | undefined
   if ((versionRow ? Number(versionRow.value) : 0) >= SEED_VERSION) return
 
+  db.prepare('DELETE FROM challenge_part_progress').run()
   db.prepare('DELETE FROM challenge_variants').run()
   db.prepare('DELETE FROM test_cases').run()
   db.prepare('DELETE FROM progress').run()
   db.prepare('DELETE FROM review_requests').run()
+  db.prepare('DELETE FROM challenge_parts').run()
   db.prepare('DELETE FROM challenges').run()
   db.prepare('DELETE FROM concepts').run()
 
@@ -40,6 +42,10 @@ function variant(db: Database.Database, cid: number, lang: string, statement: st
 
 function tc(db: Database.Database, cid: number, input: unknown, expected: string, ord: number): void {
   db.prepare('INSERT INTO test_cases (challenge_id, input_json, expected_output, ord) VALUES (?, ?, ?, ?)').run(cid, JSON.stringify(input), expected, ord)
+}
+
+function setGroup(db: Database.Database, slug: string, groupName: string): void {
+  db.prepare('UPDATE challenges SET group_name = ? WHERE slug = ?').run(groupName, slug)
 }
 
 function seedAll(db: Database.Database): void {
@@ -106,7 +112,7 @@ function seedAll(db: Database.Database): void {
   variant(db, v1, 'blocks', 'Guarda 10 en una caja llamada edad y muestra el valor de esa variable.\n\n🧩 En «Variables» pulsa «Crear variable…» y llámala edad (aparecen «poner [edad] a» y «[edad]»). Usa «poner [edad] a» con un número 10 dentro, luego «imprimir» con la variable «[edad]» en su interior.', '', ['En «Variables» crea edad usando «Crear variable…»', 'Arrastra «poner [edad] a» y mete dentro un número 10.', 'Después arrastra «imprimir» con la variable «[edad]» dentro.'])
   tc(db, v1, null, '10', 0)
 
-  const v2 = challenge(db, vars, 'caja-cuenta', 'Cajas que calculan', 'Ahora que sabes guardar números, puedes hacer cuentas CON los números guardados en cajas. Si guardas el 5 en una caja a y el 3 en la caja b, puedes sumarlas: a + b te da 8. ¡Los números de las cajas se operan como los números normales!', 2)
+  const v2 = challenge(db, vars, 'caja-cuenta', 'Cajas que calculan', 'Ahora que sabes guardar números, puedes hacer cuentas CON los números guardados en cajas. Si guardas el 5 en una caja a y el 3 en la caja b, puedes sumarlas: a + b te da 8. ¡Los números de las cajas se operan como los números normales!', 1)
   variant(db, v2, 'js', 'Crea dos variables: a = 5 y b = 3. Suma los valores de ambas cajas y muestra el resultado.\n\n👉 Cuando usas a + b, el ordenador toma el 5 y el 3 de las cajas y suma: 5 + 3 = 8.', 'let a = 5\nlet b = 3\nprint(a + b)', ['Guarda dos valores: let a = 5 y let b = 3', 'El signo + suma directamente: a + b suma el contenido de ambas cajas.', 'Debe salir 8.'])
   variant(db, v2, 'python', 'Crea dos variables: a = 5 y b = 3. Suma los valores de ambas cajas y muestra el resultado.\n\n👉 Cuando usas a + b, el ordenador toma el 5 y el 3 de las cajas y suma: 5 + 3 = 8.', 'a = 5\nb = 3\nprint(a + b)', ['Guarda dos valores: a = 5 y b = 3', 'El signo + suma directamente: a + b suma el contenido de ambas cajas.', 'Debe salir 8.'])
   variant(db, v2, 'blocks', 'Crea dos variables: a = 5 y b = 3. Suma sus valores y muestra el resultado.\n\n🧩 En «Variables» crea las variables a y b. Luego usa dos bloques «poner [a] a» y «poner [b] a» con números dentro. Finalmente, con «imprimir», suma los dos bloques verdes «[a]» y «[b]» usando un bloque de operación de «Matemáticas».', '', ['En «Variables» crea a y b (pulsa «Crear variable…» dos veces).', 'Arrastra «poner [a] a 5» y «poner [b] a 3».', 'En «Matemáticas» coge el bloque de operación y pon un bloque «[a]» en un hueco y un bloque «[b]» en el otro. Encája eso en «imprimir».'])
@@ -118,7 +124,7 @@ function seedAll(db: Database.Database): void {
   variant(db, v3, 'blocks', 'Guarda "Lia" en una caja llamada nombre y muestra: Hola, Lia. ¿Qué tal?\n\n🧩 En «Variables» crea nombre. Luego usa «poner [nombre] a» con un texto «Lia» dentro. Con «imprimir» y «combinar textos», pega «Hola, », la variable «[nombre]» y «. ¿Qué tal?» (¡con el punto delante!).', '', ['En «Variables» crea nombre.', 'Usa «poner [nombre] a» con un bloque de texto «Lia» dentro.', 'En «Imprimir» coge «combinar textos» (o encadena varios); pega en orden: un texto «Hola, », luego la variable «[nombre]», luego un texto «. ¿Qué tal?» (con punto y espacio).'])
   tc(db, v3, null, 'Hola, Lia. ¿Qué tal?', 0)
 
-  const r2 = challenge(db, vars, 'mi-nombre', 'Me presento', 'Una VARIABLE es como una cajita con una etiqueta: le pones un nombre y guardas algo dentro. Después puedes usar ese valor solo con escribir el nombre de la caja. Vamos a guardar un nombre y mostrarlo.', 1)
+  const r2 = challenge(db, vars, 'mi-nombre', 'Me presento', 'Una VARIABLE es como una cajita con una etiqueta: le pones un nombre y guardas algo dentro. Después puedes usar ese valor solo con escribir el nombre de la caja. Vamos a guardar un nombre y mostrarlo.', 2)
   variant(db, r2, 'js', 'Crea una variable llamada nombre que valga "Mundo" y muestra: Hola, Mundo\n\n👉 let nombre = "Mundo" crea la caja. Con + puedes pegar dos textos: "Hola, " + nombre.', 'let nombre = "..."\nprint("Hola, " + nombre)', ['Guarda el valor en la caja: let nombre = "Mundo"', 'El signo + une (pega) dos textos: "Hola, " + nombre', 'Fíjate en la coma y el espacio: debe salir "Hola, Mundo".'])
   variant(db, r2, 'python', 'Crea una variable llamada nombre que valga "Mundo" y muestra: Hola, Mundo\n\n👉 nombre = "Mundo" crea la caja. Con + puedes pegar dos textos: "Hola, " + nombre.', 'nombre = "..."\nprint("Hola, " + nombre)', ['Guarda el valor en la caja: nombre = "Mundo"', 'El signo + une (pega) dos textos: "Hola, " + nombre', 'Fíjate en la coma y el espacio: debe salir "Hola, Mundo".'])
   variant(db, r2, 'blocks', 'Guarda "Mundo" en una caja llamada nombre y muestra: Hola, Mundo\n\n🧩 En «Variables» pulsa «Crear variable…» y llámala nombre (aparecen «poner [nombre] a» y «[nombre]»). En «Imprimir» tienes «combinar textos», que une dos trozos en uno.', '', ['En «Variables» crea nombre y usa «poner [nombre] a» con un texto «Mundo» dentro.', 'En «Imprimir» coge «combinar textos»: en el primer hueco un texto «Hola, » y en el segundo el bloque verde «[nombre]».', 'Mete ese «combinar textos» dentro de «imprimir». Cuida la coma y el espacio: «Hola, ».'])
@@ -276,4 +282,34 @@ function seedAll(db: Database.Database): void {
   tc(db, proj_guesser, { secreto: 5, intentos: [2, 8, 5] }, 'más alto\nmás bajo\n¡acertaste!', 0)
   tc(db, proj_guesser, { secreto: 3, intentos: [3] }, '¡acertaste!', 1)
   tc(db, proj_guesser, { secreto: 10, intentos: [10, 1] }, '¡acertaste!\nmás alto', 2)
+
+  // ── Grupos de multilección ─────────────────────────────────────────────────
+  setGroup(db, 'saludo', 'Tu primera pantalla')
+  setGroup(db, 'varias-lineas', 'Tu primera pantalla')
+  setGroup(db, 'imprimir-numeros', 'Números y cuentas')
+  setGroup(db, 'primera-cuenta', 'Números y cuentas')
+  setGroup(db, 'operaciones', 'Números y cuentas')
+  setGroup(db, 'guardar-numero', 'Cajas con números')
+  setGroup(db, 'caja-cuenta', 'Cajas con números')
+  setGroup(db, 'mi-nombre', 'Cajas con texto')
+  setGroup(db, 'juntar-textos', 'Cajas con texto')
+  setGroup(db, 'que-es-input', 'Conociendo input')
+  setGroup(db, 'suma', 'Input en acción')
+  setGroup(db, 'doble', 'Input en acción')
+  setGroup(db, 'si-o-no', 'Decisiones simples')
+  setGroup(db, 'par-impar', 'Decisiones simples')
+  setGroup(db, 'signo', 'Más condiciones')
+  setGroup(db, 'mayor-dos', 'Más condiciones')
+  setGroup(db, 'fizzbuzz', 'Reto FizzBuzz')
+  setGroup(db, 'contar', 'Mi primer bucle')
+  setGroup(db, 'suma-rango', 'Mi primer bucle')
+  setGroup(db, 'tabla-multiplicar', 'Bucles con datos')
+  setGroup(db, 'invertir', 'Bucles con datos')
+  setGroup(db, 'contar-pares', 'Bucles con datos')
+  setGroup(db, 'funcion-saludo', 'Mis primeras funciones')
+  setGroup(db, 'potencia', 'Mis primeras funciones')
+  setGroup(db, 'es-primo', 'Función avanzada')
+  setGroup(db, 'calculadora', 'Calculadora')
+  setGroup(db, 'validador-contrasena', 'Contraseñas')
+  setGroup(db, 'adivina-numero', 'Adivina el número')
 }

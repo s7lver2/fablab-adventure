@@ -51,25 +51,24 @@ export function ThemeToggle() {
   return (
     <button
       onClick={handleToggle}
+      title={`Cambiar a tema ${theme === 'dark' ? 'claro' : 'oscuro'}`}
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 8,
-        background: 'var(--adm-bg-secondary)',
-        color: 'var(--adm-text-primary)',
+        justifyContent: 'center',
+        width: 30,
+        height: 30,
+        background: 'transparent',
+        color: 'var(--adm-text-secondary)',
         border: '0.5px solid var(--adm-border)',
         borderRadius: 'var(--adm-radius-sm)',
-        padding: '6px 10px',
-        fontSize: 12,
-        fontFamily: 'var(--adm-font-mono)',
+        fontSize: 14,
         cursor: 'pointer',
         transition: 'all 0.2s ease',
-        whiteSpace: 'nowrap',
+        flexShrink: 0,
       }}
-      title={`Cambiar a tema ${theme === 'dark' ? 'claro' : 'oscuro'}`}
     >
       {theme === 'dark' ? '☀️' : '🌙'}
-      <span>{theme === 'dark' ? 'Claro' : 'Oscuro'}</span>
     </button>
   )
 }

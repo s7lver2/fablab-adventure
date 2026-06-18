@@ -164,6 +164,13 @@ export function createSchema(db: Database.Database): void {
     // tabla ya existe
   }
 
+  // Migración idempotente: añadir group_name a challenges
+  try {
+    db.exec("ALTER TABLE challenges ADD COLUMN group_name TEXT")
+  } catch {
+    // columna ya existe
+  }
+
   seedRoot(db)
 }
 

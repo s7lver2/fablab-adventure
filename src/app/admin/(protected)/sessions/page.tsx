@@ -129,102 +129,51 @@ export default function SessionsPage() {
   }, [])
 
   useEffect(() => {
-    if (!data || !durationRef.current) return
-    durationChart.current?.destroy()
-
-    const theme = chartTheme()
-    const scale = {
-      grid: { color: theme.gridColor },
-      border: { display: false as const },
-      ticks: { color: theme.textColor, font: { family: 'monospace', size: 10 } },
-    }
-
-    // Group sessions by duration buckets
-    const buckets = [
-      { label: '< 1 min', max: 60000 },
-      { label: '1–5 min', max: 300000 },
-      { label: '5–15 min', max: 900000 },
-      { label: '> 15 min', max: Infinity },
-    ]
-
-    const counts = buckets.map((b) =>
-      data.sessions.filter((s) => s.durationMs < b.max && s.durationMs >= (buckets[buckets.indexOf(b) - 1]?.max ?? 0)).length
-    )
-
-    durationChart.current = new Chart(durationRef.current.getContext('2d')!, {
-      type: 'bar',
-      data: {
-        labels: buckets.map((b) => b.label),
-        datasets: [
-          {
-            data: counts,
-            backgroundColor: INDIGO,
-            borderRadius: 4,
-            borderWidth: 0,
-          },
-        ],
-      },
-      options: {
-        animation: chartAnim(),
-        plugins: { legend: { display: false } },
-        scales: { x: scale, y: scale },
-      },
-    })
-
-    return () => {
+    function buildChart() {
+      if (!data || !durationRef.current) return
       durationChart.current?.destroy()
-    }
-  }, [data])
 
-  // Listen for theme change events to reinitialize chart
-  useEffect(() => {
-    const handleThemeChange = () => {
-      durationChart.current?.destroy()
-      durationChart.current = null
-      // Trigger chart reinitialization
-      if (data && durationRef.current) {
-        const theme = chartTheme()
-        const scale = {
-          grid: { color: theme.gridColor },
-          border: { display: false as const },
-          ticks: { color: theme.textColor, font: { family: 'monospace', size: 10 } },
-        }
-
-        const buckets = [
-          { label: '< 1 min', max: 60000 },
-          { label: '1–5 min', max: 300000 },
-          { label: '5–15 min', max: 900000 },
-          { label: '> 15 min', max: Infinity },
-        ]
-
-        const counts = buckets.map((b) =>
-          data.sessions.filter((s) => s.durationMs < b.max && s.durationMs >= (buckets[buckets.indexOf(b) - 1]?.max ?? 0)).length
-        )
-
-        durationChart.current = new Chart(durationRef.current.getContext('2d')!, {
-          type: 'bar',
-          data: {
-            labels: buckets.map((b) => b.label),
-            datasets: [
-              {
-                data: counts,
-                backgroundColor: INDIGO,
-                borderRadius: 4,
-                borderWidth: 0,
-              },
-            ],
-          },
-          options: {
-            animation: chartAnim(),
-            plugins: { legend: { display: false } },
-            scales: { x: scale, y: scale },
-          },
-        })
+      const theme = chartTheme()
+      const scale = {
+        grid: { color: theme.gridColor },
+        border: { display: false as const },
+        ticks: { color: theme.textColor, font: { family: 'monospace', size: 10 } },
       }
+
+      // Group sessions by duration buckets
+      const buckets = [
+        { label: '< 1 min', max: 60000 },
+        { label: '1–5 min', max: 300000 },
+        { label: '5–15 min', max: 900000 },
+        { label: '> 15 min', max: Infinity },
+      ]
+
+      const counts = buckets.map((b) =>
+        data.sessions.filter((s) => s.durationMs < b.max && s.durationMs >= (buckets[buckets.indexOf(b) - 1]?.max ?? 0)).length
+      )
+
+      durationChart.current = new Chart(durationRef.current.getContext('2d')!, {
+        type: 'bar',
+        data: {
+          labels: buckets.map((b) => b.label),
+          datasets: [{ data: counts, backgroundColor: INDIGO, borderRadius: 4, borderWidth: 0 }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: chartAnim(),
+          plugins: { legend: { display: false } },
+          scales: { x: scale, y: scale },
+        },
+      })
     }
 
-    window.addEventListener('adm-theme-change', handleThemeChange)
-    return () => window.removeEventListener('adm-theme-change', handleThemeChange)
+    buildChart()
+    window.addEventListener('adm-theme-change', buildChart)
+    return () => {
+      window.removeEventListener('adm-theme-change', buildChart)
+      durationChart.current?.destroy()
+    }
   }, [data])
 
   if (!data) {
@@ -289,7 +238,9 @@ export default function SessionsPage() {
           <>
             {sh('Distribución de duración de sesiones', 'sesiones')}
             <div style={{ padding: '0.75rem' }}>
-              <canvas ref={durationRef} height={130}></canvas>
+              <div style={{ position: 'relative', height: 175 }}>
+                <canvas ref={durationRef}></canvas>
+              </div>
             </div>
           </>
         )}
