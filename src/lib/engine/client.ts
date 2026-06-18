@@ -1,7 +1,7 @@
 import type { RunResult } from './js-runner'
 import type { Language } from '../curriculum/types'
 
-const TIMEOUT_MS = 3000
+const TIMEOUT_MS = 5000
 
 export function runInWorker(code: string, input: unknown, language: Language = 'js'): Promise<RunResult> {
   return new Promise((resolve) => {
@@ -15,7 +15,7 @@ export function runInWorker(code: string, input: unknown, language: Language = '
       worker.terminate()
       resolve({
         output: '',
-        error: 'Tu programa tardó demasiado. ¿Quizás hay un bucle que no termina?',
+        error: 'Tu programa tardó demasiado. Si tienes un bucle, revisa que llegue a su fin.',
         timeMs: TIMEOUT_MS,
       })
     }, TIMEOUT_MS)
