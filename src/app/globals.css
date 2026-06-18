@@ -693,6 +693,9 @@ textarea {
   --adm-radius: 12px;
   --adm-radius-sm: 6px;
 
+  /* Panel */
+  --adm-panel: #1a2332;
+
   color: var(--adm-text-primary);
   background: var(--adm-bg-primary);
 }
@@ -717,6 +720,9 @@ textarea {
   /* Borders */
   --adm-border: #cbd5e1;
   --adm-border-light: #e2e8f0;
+
+  /* Panel */
+  --adm-panel: #f1f5f9;
 
   color: var(--adm-text-primary);
   background: var(--adm-bg-primary);
