@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Chart from 'chart.js/auto'
 import { chartTheme, INDIGO, chartAnim } from '../components/adminUi'
+import { Gauge } from '../components/Gauge'
 
 interface SessionRow {
   sessionId: string
@@ -272,7 +273,15 @@ export default function SessionsPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: 8, marginBottom: '1rem' }}>
         <KPI label="let hoySesiones" value={data.summary.today} delta="sesiones únicas" />
         <KPI label="let avgDuration" value={`${avgMin} min`} delta="duración media" />
-        <KPI label="let bounceRate" value={`${data.summary.bounceRate}%`} delta="tasa de rebote" danger={data.summary.bounceRate > 50} />
+        <div
+          style={{
+            background: 'var(--adm-bg-secondary)',
+            borderRadius: 'var(--adm-radius-sm)',
+            padding: '0.875rem',
+          }}
+        >
+          <Gauge value={data.summary.bounceRate} label="REBOTE" />
+        </div>
       </div>
 
       <div style={{ marginBottom: 8 }}>
